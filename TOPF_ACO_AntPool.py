@@ -4,10 +4,11 @@ from TOPF_ACO_Ant import TOPF_ACO_Ant
 class TOPF_ACO_AntPool:
     """An ant pool is a pool of ants which are employed for one run of ACO"""
 
-    def __init__(self, robots, graph, start_node, fuelf, timef, max_time, heuristicf, pheromonef):
+    def __init__(self, id, robots, graph, start_node, fuelf, timef, max_time, heuristicf, pheromonef):
+        self.id = id
         self.n = robots
         self.g = graph
-        self.ants = [TOPF_ACO_Ant(start_node, fuelf, timef, max_time) for i in range(0, self.n)]
+        self.ants = [TOPF_ACO_Ant(i, start_node, fuelf, timef, max_time) for i in range(0, self.n)]
         self.fuelf = fuelf
         self.timef = timef
         self.max_time = max_time
@@ -25,7 +26,7 @@ class TOPF_ACO_AntPool:
         # - Not already visited by any ant in the pool
         # - Can reach node and then depot with fuel left
         # TODO: calculate the heuristic, apply pheromone
-        # to return: a list [ (node,prob), (node,prob), ... ]
+        # to return: a list [ [node,prob], [node,prob], ... ]
         feasible_neighbours = [[idx, 1] for idx, i in enumerate(self.visited_g) if i != 1]
         # Remove current node, as we do not want the current node to be a feasible neighbour
         feasible_neighbours.remove([ant.current_node, 1])
@@ -55,27 +56,36 @@ class TOPF_ACO_AntPool:
 
         return feasible_neighbours
 
-    def move_ants(self, rng):
-        """Picks the next node for each ant"""
-        for ant in self.ants:
-            f_n = self.feasible_for(ant)
-            ant.move(self.g, f_n, rng)
+    #def move_ants(self, rng):
+    #    """Picks the next node for each ant"""
+    #    for ant in self.ants:
+    #        f_n = self.feasible_for(ant)
+    #        pick = ant.move(self.g, f_n, rng)
+    #        self.visited_g[pick] = 1
 
-    def find_paths(self, rng):
+    def compute_paths(self, rng):
         # for each ant that is not done
         #   calculate the feasible nodes
-        #   if there are feasible nodes, move the ant
-        #   if not, move ant deterministically to the closest depot and mark the ants as done
+        #   if there are feasible nodes, move the ant, and mark that node as visited
+        #   if not, move ant deterministically to the starting location, ensuring that
+        #   the move is feasible. Then mark the ant done.
+        paths = []
         for ant in self.ants:
             if not ant.isdone:
                 fs = self.feasible_for(ant)
                 if fs:
-                    ant.move(self.g, fs, rng)
+                    pick = ant.move(self.g, fs, rng)
+                    self.visited_g[pick] = 1
                 else:
+                    # TODO: Check if the ant can reach the starting location from here
+                    # then
                     ant.done()
+            else:
+                paths.append(ant.get_path())
+        return paths
 
     def __str__(self):
-        s = "Ant Pool\n"
+        s = f'Ant Pool {self.id}\n'
         for a in self.ants:
             s += "  " + str(a) + "\n"
         return s

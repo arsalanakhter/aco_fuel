@@ -1,10 +1,13 @@
 import numpy as np
 import math
+import sys
+
 
 class Graph:
 
-    def __init__(self, depots, tasks):
-        self.nodes = np.random.random((depots + tasks, 2))
+    def __init__(self, rng, depots, tasks):
+        self.rng = rng
+        self.nodes = rng.random((depots + tasks, 2))
         self.depots = depots
         self.tasks = tasks
         self.adj_dist = np.zeros((depots + tasks, depots + tasks))

@@ -9,18 +9,13 @@
 import numpy as np
 
 from TOPF_ACO_AntPool import TOPF_ACO_AntPool
-########################################
-# Globals
-# MAX_TIME = 5.0
-
-########################################
 
 
 class TOPF_ACO:
 
-    def __init__(self, seed, pools, robots, graph, start_node, fuelf, timef, max_time, heuristicf, pheromonef):
-        self.rng = np.random.default_rng(seed)
-        self.pools = [TOPF_ACO_AntPool(robots, graph, start_node, fuelf, timef, max_time, heuristicf, pheromonef)
+    def __init__(self, rng, pools, robots, graph, start_node, fuelf, timef, max_time, heuristicf, pheromonef):
+        self.rng = rng
+        self.pools = [TOPF_ACO_AntPool(i, robots, graph, start_node, fuelf, timef, max_time, heuristicf, pheromonef)
                       for i in range(0, pools)]
 
     def update_pheromone(self, paths):
@@ -30,7 +25,8 @@ class TOPF_ACO:
         """Performs a full run"""
         for t in range(0, max_iterations):
             for pool in self.pools:
-                paths = pool.find_paths(self.rng)
+                pool.reset()                         # Should we do a pool reset here?
+                paths = pool.compute_paths(self.rng)
                 self.update_pheromone(paths)
             print(self)
 

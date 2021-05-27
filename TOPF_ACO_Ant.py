@@ -1,6 +1,7 @@
 class TOPF_ACO_Ant:
 
-    def __init__(self, start_node, fuelf, timef, max_time):
+    def __init__(self, id, start_node, fuelf, timef, max_time):
+        self.id = id
         self.start_node = start_node
         self.fuelf = fuelf
         self.timef = timef
@@ -13,6 +14,7 @@ class TOPF_ACO_Ant:
         self.time_available = self.max_time
         self.isdone = False
         self.path = [self.current_node]
+        self.isdone = False
 
     def move(self, graph, feasible, rng):
         """
@@ -41,7 +43,7 @@ class TOPF_ACO_Ant:
 
     def done(self):
         """
-        Sets this ant as done by moving it to a depot.
+        Sets this ant as done when this ant gets back to the starting location.
         """
         self.isdone = True
 
@@ -51,6 +53,14 @@ class TOPF_ACO_Ant:
     def time_left(self):
         return self.time_available
 
+    def get_path(self):
+        """Return the path of the ant only if the ant is done. Else return None"""
+        if self.isdone:
+            return self.path
+        return None
+
     def __str__(self):
-        return "node: " + str(self.current_node) + ", fuel: " + str(self.fuel)
+        return 'Ant ' + str(self.id) + f': node: {self.current_node:02d}' + f', fuel: {self.fuel:.2f}' + \
+            ', path_so_far: ' + str(self.path)
+
 
