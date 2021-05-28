@@ -25,10 +25,9 @@ class TOPF_ACO:
         """Performs a full run"""
         for t in range(0, max_iterations):
             for pool in self.pools:
-                pool.reset()                         # Should we do a pool reset here?
                 paths = pool.compute_paths(self.rng)
                 self.update_pheromone(paths)
-            print(self)
+            print(f'Iter:{t}', self)
 
     def __str__(self):
         s = "TOPF_ACO\n"

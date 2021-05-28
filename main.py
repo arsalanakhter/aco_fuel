@@ -14,16 +14,16 @@ g = Graph(rng,   # random number generator
           )
 
 aco = TOPF_ACO_Shared(
-    rng,      # random number generator
+    rng,    # random number generator
     1,      # pools
     3,      # ants
     g,      # graph
     0,      # start_node
     fuelf_linear,  # fuel function
     timef_linear,  # time function
-    100.0,           # max_time
+    100.0,         # max_time
     None,          # heuristic function
     None           # pheromone function
 )
-aco.run(1          # number of iterations
+aco.run(10          # number of iterations
         )

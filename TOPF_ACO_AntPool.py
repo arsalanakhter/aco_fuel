@@ -1,4 +1,5 @@
 from TOPF_ACO_Ant import TOPF_ACO_Ant
+from utils import timef_linear
 
 
 class TOPF_ACO_AntPool:
@@ -28,8 +29,10 @@ class TOPF_ACO_AntPool:
         # TODO: calculate the heuristic, apply pheromone
         # to return: a list [ [node,prob], [node,prob], ... ]
         feasible_neighbours = [[idx, 1] for idx, i in enumerate(self.visited_g) if i != 1]
-        # Remove current node, as we do not want the current node to be a feasible neighbour
-        feasible_neighbours.remove([ant.current_node, 1])
+        # Remove first node, as we do not want the first node to be a feasible neighbour for ant
+        # to go directly. If there are no fesible neighbouts, we'll send the ant to
+        # the starting location manually.
+        feasible_neighbours.remove([0, 1])
         # Based on this ant's fuel, remove those nodes from feasible neighbours which this
         # ant cannot reach
         for n in feasible_neighbours:
@@ -56,7 +59,7 @@ class TOPF_ACO_AntPool:
 
         return feasible_neighbours
 
-    #def move_ants(self, rng):
+    # def move_ants(self, rng):
     #    """Picks the next node for each ant"""
     #    for ant in self.ants:
     #        f_n = self.feasible_for(ant)
@@ -77,12 +80,22 @@ class TOPF_ACO_AntPool:
                     pick = ant.move(self.g, fs, rng)
                     self.visited_g[pick] = 1
                 else:
-                    # TODO: Check if the ant can reach the starting location from here
-                    # then
-                    ant.done()
+                    # Check if the ant can reach the starting location from here
+                    if self.can_reach_final_node(ant):
+                        ant.done()
+                    else:
+                        raise ValueError("Ant cannot reach final node from current location!")
             else:
                 paths.append(ant.get_path())
         return paths
+
+    def can_reach_final_node(self, ant):
+        """If there are no feasible nodes left, can the ant reach the final node? We assume the
+         start node to be the final node for each ant to reach back, and we check based on time
+         left,(Do we need to check fuel_compatibility?)"""
+        if self.timef(ant.time_left(), self.g, ant.current_node, ant.start_node) > 0:
+            return True
+        return False
 
     def __str__(self):
         s = f'Ant Pool {self.id}\n'

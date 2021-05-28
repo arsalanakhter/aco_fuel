@@ -10,7 +10,7 @@ class TOPF_ACO_Ant:
 
     def reset(self):
         self.current_node = self.start_node
-        self.fuel = 1.0  # Assuming max_fuel to be 1.0
+        self.fuel = 5.0  # Assuming max_fuel to be 1.0
         self.time_available = self.max_time
         self.isdone = False
         self.path = [self.current_node]
@@ -45,6 +45,7 @@ class TOPF_ACO_Ant:
         """
         Sets this ant as done when this ant gets back to the starting location.
         """
+        self.path.append(self.start_node)
         self.isdone = True
 
     def fuel_left(self):
