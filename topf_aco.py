@@ -17,16 +17,22 @@ class TOPF_ACO:
         self.rng = rng
         self.pools = [TOPF_ACO_AntPool(i, robots, graph, start_node, fuelf, timef, max_time, heuristicf, pheromonef)
                       for i in range(0, pools)]
+        self.pheromone_matrix = np.zeros((graph.num_nodes(), graph.num_nodes()))
 
-    def update_pheromone(self, paths):
+    def decay_pheromone(self):
         pass
+
+    def lay_pheromone(self):
+        """Lays the pheromone after each iteration, when the ants come up with paths"""
 
     def run(self, max_iterations):
         """Performs a full run"""
         for t in range(0, max_iterations):
             for pool in self.pools:
                 paths = pool.compute_paths(self.rng)
-                self.update_pheromone(paths)
+
+                self.decay_pheromone()
+
             print(f'Iter:{t}', self)
 
     def __str__(self):

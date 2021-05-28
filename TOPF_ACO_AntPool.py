@@ -82,7 +82,9 @@ class TOPF_ACO_AntPool:
                 else:
                     # Check if the ant can reach the starting location from here
                     if self.can_reach_final_node(ant):
-                        ant.done()
+                        ant.done(self.g)
+                    # Also, lay pheromone
+
                     else:
                         raise ValueError("Ant cannot reach final node from current location!")
             else:
@@ -92,7 +94,10 @@ class TOPF_ACO_AntPool:
     def can_reach_final_node(self, ant):
         """If there are no feasible nodes left, can the ant reach the final node? We assume the
          start node to be the final node for each ant to reach back, and we check based on time
-         left,(Do we need to check fuel_compatibility?)"""
+         left,(Do we need to check fuel_compatibility?)
+
+         :param ant: Ant object
+         """
         if self.timef(ant.time_left(), self.g, ant.current_node, ant.start_node) > 0:
             return True
         return False

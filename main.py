@@ -1,7 +1,7 @@
 from Graph import Graph
 from TOPF_ACO_Shared import TOPF_ACO_Shared
 
-from utils import fuelf_linear, timef_linear
+from utils import fuelf_linear, timef_linear, pheromonef_lay
 
 from numpy.random import default_rng
 
@@ -19,11 +19,11 @@ aco = TOPF_ACO_Shared(
     3,      # ants
     g,      # graph
     0,      # start_node
-    fuelf_linear,  # fuel function
-    timef_linear,  # time function
-    100.0,         # max_time
-    None,          # heuristic function
-    None           # pheromone function
+    fuelf_linear,      # fuel function
+    timef_linear,      # time function
+    100.0,             # max_time
+    None,              # heuristic function
+    pheromonef_lay     # pheromone function
 )
 aco.run(10          # number of iterations
         )

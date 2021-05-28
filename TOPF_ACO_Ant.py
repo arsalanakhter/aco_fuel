@@ -15,6 +15,7 @@ class TOPF_ACO_Ant:
         self.isdone = False
         self.path = [self.current_node]
         self.isdone = False
+        self.distance_travelled = 0
 
     def move(self, graph, feasible, rng):
         """
@@ -36,16 +37,19 @@ class TOPF_ACO_Ant:
         self.fuel = self.fuelf(self.fuel, graph, self.current_node, pick)
         # Update time
         self.time_available = self.timef(self.time_available, graph, self.current_node, pick)
+        # Add distance travelled
+        self.distance_travelled += graph.dist(self.current_node, pick)
         # Update current node
         self.current_node = pick
         self.path.append(pick)
         return pick
 
-    def done(self):
+    def done(self, graph):
         """
         Sets this ant as done when this ant gets back to the starting location.
         """
         self.path.append(self.start_node)
+        self.distance_travelled += graph.dist(self.current_node, self.start_node)
         self.isdone = True
 
     def fuel_left(self):
@@ -59,6 +63,8 @@ class TOPF_ACO_Ant:
         if self.isdone:
             return self.path
         return None
+
+
 
     def __str__(self):
         return 'Ant ' + str(self.id) + f': node: {self.current_node:02d}' + f', fuel: {self.fuel:.2f}' + \
