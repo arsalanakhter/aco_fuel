@@ -45,7 +45,8 @@ class TOPF_ACO:
         for t in range(0, max_iterations):
             for pool in self.pools:
                 pool.compute_paths(self.rng)
-                self.decay_pheromone()
+            self.decay_pheromone()
+            for pool in self.pools:
                 self.lay_pheromone(pool)
             print(f'Iter:{t}', self)
 
