@@ -40,7 +40,7 @@ class TOPF_ACO:
                 self.pheromone_matrix[path[i]][path[i + 1]] = current_pheromone_value + new_pheromone_value
                 self.pheromone_matrix[path[i + 1]][path[i]] = current_pheromone_value + new_pheromone_value
 
-    def run(self, max_iterations):
+    def run(self, max_iterations, plot_update_func):
         """Performs a full run"""
         for t in range(0, max_iterations):
             for pool in self.pools:
@@ -49,6 +49,7 @@ class TOPF_ACO:
             for pool in self.pools:
                 self.lay_pheromone(pool)
             print(f'Iter:{t}', self)
+            plot_update_func(self.pheromone_matrix)
 
     def __str__(self):
         s = "TOPF_ACO\n"

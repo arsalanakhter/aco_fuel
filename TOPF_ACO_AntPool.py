@@ -21,6 +21,24 @@ class TOPF_ACO_AntPool:
         for ant in self.ants:
             ant.reset()
 
+    def lay_pheromone(self, pool):
+        """Lays the pheromone after each iteration, when the ants come up with paths
+        """
+        for ant in pool.ants:
+            path = ant.path
+            for i in range(len(path) - 1):
+                # find the pheromone over this edge
+                current_pheromone_value = self.pheromone_matrix[path[i], path[i + 1]]
+
+                # update the pheromone along that section of the route
+                # (ACO)
+                # delta tau_xy_k = Q / L_k
+                new_pheromone_value = self.pheromone_growth_constant / ant.distance_travelled
+
+                self.pheromone_matrix[path[i]][path[i + 1]] = current_pheromone_value + new_pheromone_value
+                self.pheromone_matrix[path[i + 1]][path[i]] = current_pheromone_value + new_pheromone_value
+
+
     def feasible_for(self, ant):
         """Returns the list of neighbors that the ant can pick"""
         # Feasible if:
@@ -83,8 +101,6 @@ class TOPF_ACO_AntPool:
                     # Check if the ant can reach the starting location from here
                     if self.can_reach_final_node(ant):
                         ant.done(self.g)
-                    # Also, lay pheromone
-
                     else:
                         raise ValueError("Ant cannot reach final node from current location!")
             else:

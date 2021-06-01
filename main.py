@@ -42,16 +42,16 @@ def main(streamlit_viz = 0):
         n_ants,    # ants per pool
         g,         # graph
         0,         # start_node
-        fuelf_linear,  # fuel function
-        timef_linear,  # time function
-        100.0,         # max_time
-        None,          # heuristic function
+        fuelf_linear,   # fuel function
+        timef_linear,   # time function
+        100.0,          # max_time
+        None,           # heuristic function
         pheromonef_lay  # pheromone function
     )
     st.header("Console Output:")
     with st_stdout("code"):
-        aco.run(10  # number of iterations
-            )
+        aco.run(10,  # number of iterations
+                plotter.update)
 
 
 if __name__ == '__main__':

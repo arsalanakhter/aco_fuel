@@ -1,6 +1,7 @@
 import numpy as np
 import math
 import sys
+import copy
 
 
 class Graph:
@@ -17,7 +18,7 @@ class Graph:
                 diffy = self.nodes[i][1] - self.nodes[j][1]
                 self.adj_dist[i, j] = math.sqrt(diffx * diffx + diffy * diffy)
                 self.adj_dist[j, i] = self.adj_dist[i, j]
-        self.adj_time = self.adj_dist.copy()   ## TODO: Check deepcopy
+        self.adj_time = copy.deepcopy(self.adj_dist)  # Ensure deepcopy
 
     def num_nodes(self):
         return self.depots + self.tasks
