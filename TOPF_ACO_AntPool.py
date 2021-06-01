@@ -66,7 +66,7 @@ class TOPF_ACO_AntPool:
     #        pick = ant.move(self.g, f_n, rng)
     #        self.visited_g[pick] = 1
 
-    def compute_paths(self, rng):
+    def compute_paths(self, rng, pheromone_matrix):
         # for each ant that is not done
         #   calculate the feasible nodes
         #   if there are feasible nodes, move the ant, and mark that node as visited
@@ -77,7 +77,7 @@ class TOPF_ACO_AntPool:
             if not ant.isdone:
                 fs = self.feasible_for(ant)
                 if fs:
-                    pick = ant.move(self.g, fs, rng)
+                    pick = ant.move(self.g, fs, pheromone_matrix, rng)
                     self.visited_g[pick] = 1
                 else:
                     # Check if the ant can reach the starting location from here

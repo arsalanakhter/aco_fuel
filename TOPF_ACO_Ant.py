@@ -6,6 +6,8 @@ class TOPF_ACO_Ant:
         self.fuelf = fuelf
         self.timef = timef
         self.max_time = max_time
+        self.alpha = 0.5  # Parameter to weigh the effect of pheromone on choosing next node
+        self.beta = 1.2   # Parameter to weigh the effect of distance on choosing next node
         self.reset()
 
     def reset(self):
@@ -17,22 +19,36 @@ class TOPF_ACO_Ant:
         self.isdone = False
         self.distance_travelled = 0
 
-    def move(self, graph, feasible, rng):
+    def move(self, graph, feasible, pheromone_matrix, rng):
         """
         Picks the next node at random and updates the fuel
         :param graph: The graph
         :param feasible: List of pairs (node idx, prob)
         :param rng: The random number generator
         """
-        # Pick next node
-        x = rng.random()
-        y = 0.0
-        pick = -1
-        for f in feasible:
-            y += f[1]
-            if x < y:
-                pick = f[0]
-                break
+        attractiveness = dict()
+        sum_total = 0.0
+
+        for possible_next_node in feasible:
+            pheromone = float(pheromone_matrix[self.current_node, possible_next_node[0]])
+            distance = float(graph.dist(self.current_node, possible_next_node[0]))
+
+            attractiveness[possible_next_node[0]] = pow(pheromone, self.alpha) * pow(1 / distance, self.beta)
+            sum_total += attractiveness[possible_next_node[0]]
+
+        if sum_total != 0:
+            rnd_num = rng.random()
+            cumulative = 0.0
+            pick = -1
+            for possible_next_node in attractiveness:
+                weight = attractiveness[possible_next_node] / sum_total
+                if rnd_num <= weight + cumulative:
+                    pick = possible_next_node
+                    break
+                cumulative += weight
+        else:
+            pick = rng.choice(list(attractiveness.keys()))
+
         # Update fuel
         self.fuel = self.fuelf(self.fuel, graph, self.current_node, pick)
         # Update time

@@ -44,7 +44,7 @@ class TOPF_ACO:
         """Performs a full run"""
         for t in range(0, max_iterations):
             for pool in self.pools:
-                pool.compute_paths(self.rng)
+                pool.compute_paths(self.rng, self.pheromone_matrix)
             self.decay_pheromone()
             for pool in self.pools:
                 self.lay_pheromone(pool)
