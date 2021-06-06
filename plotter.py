@@ -36,6 +36,16 @@ class MapPlotter:
             text=self.graph.depots + np.array(range(len(self.graph.nodes[self.graph.depots:, 0])))
         ))
 
+        # Add Best Paths (to be updated later)
+        self.fig.add_trace(go.Scatter(
+            x=[],
+            y=[],
+            line=dict(color='red'),
+            hoverinfo='none',
+            showlegend=True,
+            name='Best Paths',
+            mode='lines'))
+
         self.st_plotly_chart = st.plotly_chart(self.fig)
 
         # Empty plot to show the distance convergence
@@ -43,8 +53,9 @@ class MapPlotter:
         # self.distance_chart = st.line_chart(self.df_distance)
         # self.text = st.empty()
 
-    def update(self, pheromone_matrix):
+    def update(self, pheromone_matrix, best_paths):
         self._update_pheromone_lines(pheromone_matrix)
+        self._update_best_paths(best_paths)
         self.st_plotly_chart.plotly_chart(self.fig)
         time.sleep(1)
 
@@ -79,7 +90,15 @@ class MapPlotter:
                 self.fig.add_trace(go.Scatter(
                     x=[self.graph.nodes[i, 0], self.graph.nodes[j, 0]],
                     y=[self.graph.nodes[i, 1], self.graph.nodes[j, 1]],
-                    line=dict(width=p_matrix[i, j]/100, color='grey'),
+                    line=dict(width=p_matrix[i, j] / 100, color='grey'),
                     hoverinfo='none',
                     showlegend=False,
                     mode='lines'))
+
+    def _update_best_paths(self, best_paths):
+        for path in best_paths:
+            path_coords = self.graph.nodes[path, :]
+            self.fig.update_traces(selector=dict(name='Best Paths'),
+                                   x=path_coords[:, 0],
+                                   y=path_coords[:, 1])
+            break

@@ -9,8 +9,7 @@ from numpy.random import default_rng
 import streamlit as st
 
 
-def main(streamlit_viz = 0):
-
+def main(streamlit_viz=0):
     st.title("Ant Colony Optimization with Fuel")
     st.write("Create a graph with task an depot nodes. Display the pheromones and best path.")
     seed = 12345
@@ -37,15 +36,15 @@ def main(streamlit_viz = 0):
     plotter.init_plot()
 
     aco = TOPF_ACO_Shared(
-        rng,       # random number generator
-        n_pools,   # pools
-        n_ants,    # ants per pool
-        g,         # graph
-        0,         # start_node
-        fuelf_linear,   # fuel function
-        timef_linear,   # time function
-        100.0,          # max_time
-        None,           # heuristic function
+        rng,  # random number generator
+        n_pools,  # pools
+        n_ants,  # ants per pool
+        g,  # graph
+        0,  # start_node
+        fuelf_linear,  # fuel function
+        timef_linear,  # time function
+        100.0,  # max_time
+        None,  # heuristic function
         pheromonef_lay  # pheromone function
     )
     st.header("Console Output:")
@@ -55,4 +54,4 @@ def main(streamlit_viz = 0):
 
 
 if __name__ == '__main__':
-    main(streamlit_viz=1)
+    main(streamlit_viz=0)

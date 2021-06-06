@@ -42,14 +42,17 @@ class TOPF_ACO:
 
     def run(self, max_iterations, plot_update_func):
         """Performs a full run"""
+        best_paths = []
         for t in range(0, max_iterations):
             for pool in self.pools:
-                pool.compute_paths(self.rng, self.pheromone_matrix)
+                pool.reset()
+                best_paths = pool.compute_paths(self.rng, self.pheromone_matrix)  # Assuming single pool
             self.decay_pheromone()
             for pool in self.pools:
                 self.lay_pheromone(pool)
             print(f'Iter:{t}', self)
-            plot_update_func(self.pheromone_matrix)
+            print(f'Best Paths: {best_paths}')
+            plot_update_func(self.pheromone_matrix, best_paths)  # Assuming single pool
 
     def __str__(self):
         s = "TOPF_ACO\n"
