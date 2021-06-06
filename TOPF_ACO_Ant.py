@@ -7,7 +7,7 @@ class TOPF_ACO_Ant:
         self.timef = timef
         self.max_time = max_time
         self.alpha = 0.5  # Parameter to weigh the effect of pheromone on choosing next node
-        self.beta = 1.2   # Parameter to weigh the effect of distance on choosing next node
+        self.beta = 1.2  # Parameter to weigh the effect of distance on choosing next node
         self.reset()
 
     def reset(self):
@@ -30,11 +30,18 @@ class TOPF_ACO_Ant:
         sum_total = 0.0
 
         for possible_next_node in feasible:
-            pheromone = float(pheromone_matrix[self.current_node, possible_next_node[0]])
-            distance = float(graph.dist(self.current_node, possible_next_node[0]))
+            # Check if the ant really need to go to a depot? If there is a single task node
+            # available in the feasible nodes, remove all the depot nodes
+            feasible.sort()
+            if feasible[-1] > graph.depots:  # If the last element in the sorted list is greater than depots,
+                feasible = [i for i in feasible if i > graph.depots]  # it means a feasible task exists. Hence only make the tasks
+                # to be feasible for selection now
 
-            attractiveness[possible_next_node[0]] = pow(pheromone, self.alpha) * pow(1 / distance, self.beta)
-            sum_total += attractiveness[possible_next_node[0]]
+            pheromone = float(pheromone_matrix[self.current_node, possible_next_node])
+            distance = float(graph.dist(self.current_node, possible_next_node))
+
+            attractiveness[possible_next_node] = pow(pheromone, self.alpha) * pow(1 / distance, self.beta)
+            sum_total += attractiveness[possible_next_node]
 
         if sum_total != 0:
             rnd_num = rng.random()
@@ -80,10 +87,6 @@ class TOPF_ACO_Ant:
             return self.path
         return None
 
-
-
     def __str__(self):
         return 'Ant ' + str(self.id) + f': node: {self.current_node:02d}' + f', fuel: {self.fuel:.2f}' + \
-            ', path_so_far: ' + str(self.path)
-
-
+               ', path_so_far: ' + str(self.path)

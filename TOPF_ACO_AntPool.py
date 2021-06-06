@@ -48,36 +48,34 @@ class TOPF_ACO_AntPool:
         # Feasible if:
         # - Not already visited by any ant in the pool
         # - Can reach node and then depot with fuel left
-        # TODO: calculate the heuristic, apply pheromone
         # to return: a list [ [node,prob], [node,prob], ... ]
-        feasible_neighbours = [[idx, 1] for idx, i in enumerate(self.visited_g) if i != 1]
+        feasible_neighbours = [idx for idx, i in enumerate(self.visited_g) if i != 1]
         # Remove first node, as we do not want the first node to be a feasible neighbour for ant
         # to go directly. If there are no feasible neighbours, we'll send the ant to
         # the starting location manually.
-        feasible_neighbours.remove([0, 1])
+        feasible_neighbours.remove(0)
         # Based on this ant's fuel, remove those nodes from feasible neighbours which this
         # ant cannot reach
+        to_be_removed = []
         for n in feasible_neighbours:
-            if self.fuelf(ant.fuel_left(), self.g, ant.current_node, n[0]) <= 0:
-                n[1] = 0
-        feasible_neighbours = [n for n in feasible_neighbours if n[1] > 0]
+            if self.fuelf(ant.fuel_left(), self.g, ant.current_node, n) <= 0:
+                to_be_removed.append(n)
         # Also remove those neighbours from which the ant cannot reach a depot with
         # fuel_left after visiting current feasible neighbours
         for n in feasible_neighbours:
-            fuel_at_n = self.fuelf(ant.fuel_left(), self.g, ant.current_node, n[0])
+            fuel_at_n = self.fuelf(ant.fuel_left(), self.g, ant.current_node, n)
             for i in range(self.g.depots):
-                if self.fuelf(fuel_at_n, self.g, n[0], i) < 0:
-                    n[1] = 0
-        feasible_neighbours = [n for n in feasible_neighbours if n[1] > 0]
+                if self.fuelf(fuel_at_n, self.g, n, i) < 0:
+                    to_be_removed.append(n)
 
         # Also remove those neighbours from which the ant cannot reach back the start node
         # based on time, after visiting this neighbour. Assuming start node is the
         # first node in the node list
         for n in feasible_neighbours:
-            time_at_n = self.timef(ant.time_left(), self.g, ant.current_node, n[0])
-            if self.timef(time_at_n, self.g, n[0], ant.start_node) < 0:
-                n[1] = 0
-        feasible_neighbours = [n for n in feasible_neighbours if n[1] > 0]
+            time_at_n = self.timef(ant.time_left(), self.g, ant.current_node, n)
+            if self.timef(time_at_n, self.g, n, ant.start_node) < 0:
+                to_be_removed.append(n)
+        feasible_neighbours = [n for n in feasible_neighbours if n not in to_be_removed]
 
         return feasible_neighbours
 
