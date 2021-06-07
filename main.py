@@ -20,12 +20,16 @@ def main(streamlit_viz=0):
         n_tasks = st.sidebar.slider("Number of tasks", 1, 10, 1)
         n_pools = st.sidebar.slider("Number of ant pools", 1, 5, 1)
         n_ants = st.sidebar.slider("Number of ants per pool", 1, 10, 1)
+        max_ant_fuel = st.sidebar.slider("Maximum Ant Fuel", 1.0, 10.0, 0.5)
+        max_mission_time = st.sidebar.slider("Maximum mission time", 1, 100, 1)
 
     else:
         n_depots = 10
         n_tasks = 10
         n_pools = 1
         n_ants = 3
+        max_ant_fuel = 5
+        max_mission_time = 100
 
     g = Graph(rng,  # random number generator
               n_depots,  # No. of depots
@@ -43,7 +47,8 @@ def main(streamlit_viz=0):
         0,  # start_node
         fuelf_linear,  # fuel function
         timef_linear,  # time function
-        100.0,  # max_time
+        max_ant_fuel,  # maximum fuel for each ant
+        max_mission_time,  # max_time
         None,  # heuristic function
         pheromonef_lay  # pheromone function
     )
@@ -54,4 +59,4 @@ def main(streamlit_viz=0):
 
 
 if __name__ == '__main__':
-    main(streamlit_viz=0)
+    main(streamlit_viz=1)

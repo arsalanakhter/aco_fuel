@@ -7,11 +7,11 @@ import sys
 class TOPF_ACO_AntPool:
     """An ant pool is a pool of ants which are employed for one run of ACO"""
 
-    def __init__(self, id, robots, graph, start_node, fuelf, timef, max_time, heuristicf, pheromonef):
+    def __init__(self, id, robots, graph, start_node, fuelf, timef, max_fuel, max_time, heuristicf, pheromonef):
         self.id = id
         self.n = robots
         self.g = graph
-        self.ants = [TOPF_ACO_Ant(i, start_node, fuelf, timef, max_time) for i in range(0, self.n)]
+        self.ants = [TOPF_ACO_Ant(i, start_node, fuelf, timef, max_fuel, max_time) for i in range(0, self.n)]
         self.fuelf = fuelf
         self.timef = timef
         self.max_time = max_time

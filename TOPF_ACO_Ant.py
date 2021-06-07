@@ -1,18 +1,19 @@
 class TOPF_ACO_Ant:
 
-    def __init__(self, id, start_node, fuelf, timef, max_time):
+    def __init__(self, id, start_node, fuelf, timef, max_fuel, max_time):
         self.id = id
         self.start_node = start_node
         self.fuelf = fuelf
         self.timef = timef
         self.max_time = max_time
+        self.max_fuel = max_fuel
         self.alpha = 0.5  # Parameter to weigh the effect of pheromone on choosing next node
         self.beta = 1.2  # Parameter to weigh the effect of distance on choosing next node
         self.reset()
 
     def reset(self):
         self.current_node = self.start_node
-        self.fuel = 5.0  # Assuming max_fuel to be 1.0
+        self.fuel = self.max_fuel
         self.time_available = self.max_time
         self.isdone = False
         self.path = [self.current_node]

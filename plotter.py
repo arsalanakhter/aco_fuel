@@ -117,6 +117,6 @@ class MapPlotter:
                     'navy', 	#000080
                     'blue', 	#0000ff
                     'teal', 	#008080
-                    'aqua',]
+                    'aqua']
         # getting random color from list of hex colors
         return random.choice(colors)
