@@ -32,7 +32,7 @@ def main(streamlit_viz=0):
               n_tasks  # No. of Tasks
               )
 
-    plotter = MapPlotter(g)
+    plotter = MapPlotter(g, n_ants)
     plotter.init_plot()
 
     aco = TOPF_ACO_Shared(

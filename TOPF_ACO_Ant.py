@@ -34,8 +34,9 @@ class TOPF_ACO_Ant:
             # available in the feasible nodes, remove all the depot nodes
             feasible.sort()
             if feasible[-1] > graph.depots:  # If the last element in the sorted list is greater than depots,
-                feasible = [i for i in feasible if i > graph.depots]  # it means a feasible task exists. Hence only make the tasks
-                # to be feasible for selection now
+                feasible = [i for i in feasible if i > graph.depots]  # it means a feasible task exists.
+                # Hence only make the tasks to be feasible for selection now. Do not unnecessarily
+                # go to depots.
 
             pheromone = float(pheromone_matrix[self.current_node, possible_next_node])
             distance = float(graph.dist(self.current_node, possible_next_node))

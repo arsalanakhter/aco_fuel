@@ -2,10 +2,11 @@ import plotly.graph_objects as go
 import streamlit as st
 import time
 import numpy as np
+import random
 
 
 class MapPlotter:
-    def __init__(self, graph):
+    def __init__(self, graph, n_ants):
         self.graph = graph
         self.r = None
         self.layer_pheromones = None
@@ -15,6 +16,7 @@ class MapPlotter:
         self.df_distance = None
         self.distance_chart = None
         self.fig = go.Figure()
+        self.n_ants = n_ants
 
     def init_plot(self):
         # Add Depots
@@ -37,14 +39,15 @@ class MapPlotter:
         ))
 
         # Add Best Paths (to be updated later)
-        self.fig.add_trace(go.Scatter(
-            x=[],
-            y=[],
-            line=dict(color='red'),
-            hoverinfo='none',
-            showlegend=True,
-            name='Best Paths',
-            mode='lines'))
+        for n in range(self.n_ants):
+            self.fig.add_trace(go.Scatter(
+                x=[],
+                y=[],
+                line=dict(color=self._pick_random_color()),
+                hoverinfo='none',
+                showlegend=True,
+                name='Best Path Ant '+str(n),
+                mode='lines'))
 
         self.st_plotly_chart = st.plotly_chart(self.fig)
 
@@ -54,7 +57,7 @@ class MapPlotter:
         # self.text = st.empty()
 
     def update(self, pheromone_matrix, best_paths):
-        self._update_pheromone_lines(pheromone_matrix)
+        #self._update_pheromone_lines(pheromone_matrix)
         self._update_best_paths(best_paths)
         self.st_plotly_chart.plotly_chart(self.fig)
         time.sleep(1)
@@ -96,9 +99,24 @@ class MapPlotter:
                     mode='lines'))
 
     def _update_best_paths(self, best_paths):
-        for path in best_paths:
-            path_coords = self.graph.nodes[path, :]
-            self.fig.update_traces(selector=dict(name='Best Paths'),
+        for n in range(self.n_ants):
+            path_coords = self.graph.nodes[best_paths[n], :]
+            self.fig.update_traces(selector=dict(name='Best Path Ant '+str(n)),
                                    x=path_coords[:, 0],
                                    y=path_coords[:, 1])
-            break
+
+    def _pick_random_color(self):
+        colors = [  'black',
+                    'maroon', 	#800000
+                    'red', 	    #ff0000
+                    'purple', 	#800080
+                    'fuchsia', 	#ff00ff
+                    'green', 	#008000
+                    'olive', 	#808000
+                    'yellow', 	#ffff00
+                    'navy', 	#000080
+                    'blue', 	#0000ff
+                    'teal', 	#008080
+                    'aqua',]
+        # getting random color from list of hex colors
+        return random.choice(colors)
