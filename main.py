@@ -8,6 +8,8 @@ from utils import fuelf_linear, timef_linear, pheromonef_lay
 from numpy.random import default_rng
 import streamlit as st
 
+from TOPF_Optimal import TOPF_Optimal
+
 
 def main(streamlit_viz=0):
     st.title("Ant Colony Optimization with Fuel")
@@ -18,16 +20,16 @@ def main(streamlit_viz=0):
     if streamlit_viz:
         n_depots = st.sidebar.slider("Number of depots", 1, 10, 1)
         n_tasks = st.sidebar.slider("Number of tasks", 1, 10, 1)
-        n_pools = st.sidebar.slider("Number of ant pools", 1, 5, 1)
+        n_pools = st.sidebar.slider("Number of ant pools", 1, 20, 1)
         n_ants = st.sidebar.slider("Number of ants per pool", 1, 10, 1)
         max_ant_fuel = st.sidebar.slider("Maximum Ant Fuel", 1.0, 10.0, 0.5)
         max_mission_time = st.sidebar.slider("Maximum mission time", 1, 100, 1)
 
     else:
-        n_depots = 10
-        n_tasks = 10
+        n_depots = 1
+        n_tasks = 1
         n_pools = 1
-        n_ants = 3
+        n_ants = 1
         max_ant_fuel = 5
         max_mission_time = 100
 
@@ -38,6 +40,10 @@ def main(streamlit_viz=0):
 
     plotter = MapPlotter(g, n_ants)
     plotter.init_plot()
+
+    optimal_sol = TOPF_Optimal(g, n_ants, max_ant_fuel, max_mission_time, seed)
+    optimal_sol.solve()
+    optimal_sol.write_lp_and_sol_to_disk()
 
     aco = TOPF_ACO_Shared(
         rng,  # random number generator
@@ -59,4 +65,4 @@ def main(streamlit_viz=0):
 
 
 if __name__ == '__main__':
-    main(streamlit_viz=1)
+    main(streamlit_viz=0)

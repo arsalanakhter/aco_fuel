@@ -17,7 +17,7 @@ class TOPF_ACO:
         self.rng = rng
         self.pools = [TOPF_ACO_AntPool(i, robots, graph, start_node, fuelf, timef, max_fuel, max_time, heuristicf, pheromonef)
                       for i in range(0, pools)]
-        self.pheromone_matrix = np.zeros((graph.num_nodes(), graph.num_nodes()))
+        self.pheromone_matrix = np.zeros((graph.num_nodes(), graph.num_nodes(), robots))
         self.pheromone_growth_constant = 100
 
     def decay_pheromone(self):
@@ -29,16 +29,9 @@ class TOPF_ACO:
         for ant in pool.ants:
             path = ant.path
             for i in range(len(path) - 1):
-                # find the pheromone over this edge
-                current_pheromone_value = self.pheromone_matrix[path[i], path[i + 1]]
-
-                # update the pheromone along that section of the route
-                # (ACO)
-                # delta tau_xy_k = Q / L_k
-                new_pheromone_value = self.pheromone_growth_constant / ant.distance_travelled
-
-                self.pheromone_matrix[path[i]][path[i + 1]] = current_pheromone_value + new_pheromone_value
-                self.pheromone_matrix[path[i + 1]][path[i]] = current_pheromone_value + new_pheromone_value
+                delta_pheromone_value = self.pheromone_growth_constant / ant.distance_travelled
+                self.pheromone_matrix[path[i], path[i + 1], ant.id] += delta_pheromone_value
+                self.pheromone_matrix[path[i + 1], path[i], ant.id] += delta_pheromone_value
 
     def run(self, max_iterations, plot_update_func):
         """Performs a full run"""

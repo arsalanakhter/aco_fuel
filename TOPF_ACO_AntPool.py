@@ -26,29 +26,12 @@ class TOPF_ACO_AntPool:
         for ant in self.ants:
             ant.reset()
 
-    def lay_pheromone(self, pool):
-        """Lays the pheromone after each iteration, when the ants come up with paths
-        """
-        for ant in pool.ants:
-            path = ant.path
-            for i in range(len(path) - 1):
-                # find the pheromone over this edge
-                current_pheromone_value = self.pheromone_matrix[path[i], path[i + 1]]
-
-                # update the pheromone along that section of the route
-                # (ACO)
-                # delta tau_xy_k = Q / L_k
-                new_pheromone_value = self.pheromone_growth_constant / ant.distance_travelled
-
-                self.pheromone_matrix[path[i]][path[i + 1]] = current_pheromone_value + new_pheromone_value
-                self.pheromone_matrix[path[i + 1]][path[i]] = current_pheromone_value + new_pheromone_value
-
     def feasible_for(self, ant):
         """Returns the list of neighbors that the ant can pick"""
         # Feasible if:
         # - Not already visited by any ant in the pool
+        # TODO: Check if this condition forces a depot to not be visited by multiple ants
         # - Can reach node and then depot with fuel left
-        # to return: a list [ [node,prob], [node,prob], ... ]
         feasible_neighbours = [idx for idx, i in enumerate(self.visited_g) if i != 1]
         # Remove first node, as we do not want the first node to be a feasible neighbour for ant
         # to go directly. If there are no feasible neighbours, we'll send the ant to
@@ -78,13 +61,6 @@ class TOPF_ACO_AntPool:
         feasible_neighbours = [n for n in feasible_neighbours if n not in to_be_removed]
 
         return feasible_neighbours
-
-    # def move_ants(self, rng):
-    #    """Picks the next node for each ant"""
-    #    for ant in self.ants:
-    #        f_n = self.feasible_for(ant)
-    #        pick = ant.move(self.g, f_n, rng)
-    #        self.visited_g[pick] = 1
 
     def compute_paths(self, rng, pheromone_matrix):
         # for each ant that is not done

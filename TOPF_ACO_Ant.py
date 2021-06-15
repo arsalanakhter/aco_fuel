@@ -27,6 +27,7 @@ class TOPF_ACO_Ant:
         :param feasible: List of pairs (node idx, prob)
         :param rng: The random number generator
         """
+        # TODO: Check ant move function for its accuracy
         attractiveness = dict()
         sum_total = 0.0
 
@@ -39,7 +40,7 @@ class TOPF_ACO_Ant:
                 # Hence only make the tasks to be feasible for selection now. Do not unnecessarily
                 # go to depots.
 
-            pheromone = float(pheromone_matrix[self.current_node, possible_next_node])
+            pheromone = float(pheromone_matrix[self.current_node, possible_next_node, self.id])
             distance = float(graph.dist(self.current_node, possible_next_node))
 
             attractiveness[possible_next_node] = pow(pheromone, self.alpha) * pow(1 / distance, self.beta)

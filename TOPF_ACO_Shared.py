@@ -14,7 +14,7 @@ class TOPF_ACO_Shared(TOPF_ACO):
         """
         # 1. Decay according to the formula
         # tau_xy <- (1-rho)*tau_xy	(ACO), where rho is the decay coefficient
-        # TODO: Use numpy matrices instead of for loop
+        # Used numpy matrices instead of for loop
         pheromone_decay_coefficient = 0.4
         self.pheromone_matrix = (1 - pheromone_decay_coefficient) * self.pheromone_matrix
 
