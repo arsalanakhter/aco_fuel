@@ -81,6 +81,9 @@ class TOPF_ACO_Ant:
     def fuel_left(self):
         return self.fuel
 
+    def fuel_spent(self):
+        return self.max_fuel - self.fuel
+
     def time_left(self):
         return self.time_available
 

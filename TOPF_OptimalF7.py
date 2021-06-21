@@ -6,7 +6,7 @@ import csv
 import regex as re
 
 
-class TOPF_OptimalF6:
+class TOPF_OptimalF7:
 
     def __init__(self, g, n_ants, max_ant_fuel, max_mission_time, seed):
         self.iteration = 0  # To be used later for multiple runs
@@ -43,12 +43,12 @@ class TOPF_OptimalF6:
     def init_model(self):
         # Initialize the model
         self.model = Model(
-            'F6TOMinMax-' + '-Seed:' + str(self.thisSeed))
+            'F7TOBasic-' + '-Seed:' + str(self.thisSeed))
         # Decision variables and their bounds
         x = self.model.addVars(self.arcs, lb=0, ub=self.arc_ub, name="x", vtype=GRB.INTEGER)
         y = self.model.addVars(self.k_y, name="y", vtype=GRB.BINARY)
-        g = self.model.addVars(self.arcs, name="g", vtype=GRB.INTEGER)
-        p = self.model.addVars(self.arcs, name="p", vtype=GRB.CONTINUOUS)
+        r = self.model.addVars(self.N, lb=0, ub=self.L, vtype=GRB.CONTINUOUS, name="r")
+        q = self.model.addVars(self.arcs, vtype=GRB.CONTINUOUS, name="q")
         z = self.model.addVar(name="z", vtype=GRB.CONTINUOUS)
 
         # Objective function
@@ -95,35 +95,44 @@ class TOPF_OptimalF6:
             (quicksum(self.c[i, j] * x[i, j, k] * 1 / self.vel for i in self.N for j in self.N if i != j) <= self.T_max
              for k in self.K), name="c6")
 
-        # Task based flow constraints
-        c7 = self.model.addConstrs(
-            ((quicksum((g[s, i, k] - g[i, s, k]) for i in self.N for s in self.S if i not in self.S)) ==
-             (quicksum(x[i, j, k] for i in self.T for j in self.N if i != j)) for k in self.K), name="c7")
-        c8 = self.model.addConstrs(((quicksum((g[j, i, k] - g[i, j, k]) for j in self.N if i != j)) ==
-                                    (quicksum(x[i, j, k] for j in self.N if i != j)) for i in self.T for k in self.K),
-                                   name="c8")
-        c9 = self.model.addConstrs(((quicksum((g[j, i, k] - g[i, j, k]) for j in self.N if j != i))
-                                    == 0 for i in self.D for k in self.K), name="c9")
-        # c10 = self.model.addConstrs(( 0 <= g[i,j,k] <= self.noOfTasks*x[i,j,k] for i in self.N for j in self.N for k in self.K if i!=j), name="c10")
-        c10_1 = self.model.addConstrs((0 <= g[i, j, k] for i in self.N for j in self.N for k in self.K if i != j),
-                                      name="c10_1")
-        c10_2 = self.model.addConstrs(
-            (g[i, j, k] <= self.noOfTasks * x[i, j, k] for i in self.N for j in self.N for k in self.K if i != j),
-            name="c10_2")
+        # Time based flow constraints
+        c7 = self.model.addConstrs((quicksum(q[i, j, k] for j in self.N if i != j and j not in self.S) -
+                                    quicksum(q[j, i, k] for j in self.N if i != j and j not in self.E) ==
+                                    quicksum(self.c[i, j] * x[i, j, k] for j in self.N if i != j)
+                                    for k in self.K for i in self.N if i not in self.E), name='c7')
+        # c8 = self.model.addConstrs((0 <= q[i,j,k] <= self.T_max*x[i,j,k] for i in self.N for j in self.N for k in self.K if i!=j and i not in self.E and j not in self.S), name='c8' )
+        c8_1 = self.model.addConstrs((0 <= q[i, j, k] for i in self.N for j in self.N for k in self.K if
+                                      i != j and i not in self.E and j not in self.S), name='c8_1')
+        c8_2 = self.model.addConstrs(
+            (q[i, j, k] <= self.T_max * x[i, j, k] for i in self.N for j in self.N for k in self.K if
+             i != j and i not in self.E and j not in self.S), name='c8_2')
+        c9 = self.model.addConstrs(
+            (q[s, i, k] == self.f[s, i] * x[s, i, k] for i in self.T + self.D + self.E for s in self.S for k in self.K),
+            name='c9')
 
-        # Arc based fuel constraints
-        c11 = self.model.addConstrs((quicksum(p[t, i, k] for k in self.K for i in self.N if t != i) -
-                                     quicksum(p[i, t, k] for k in self.K for i in self.N if t != i) ==
-                                     quicksum(self.f[t, i] * x[t, i, k] for k in self.K for i in self.N if t != i)
-                                     for t in self.T), name='c11')
+        # Node based fuel constraints
+        M = 1e6
+        c10 = self.model.addConstrs(
+            (r[j] - r[i] + self.f[i, j] <= M * (1 - x[i, j, k]) for i in self.T for j in self.T for k in self.K if
+             i != j), name="c10")
+        c11 = self.model.addConstrs(
+            (r[j] - r[i] + self.f[i, j] >= -M * (1 - x[i, j, k]) for i in self.T for j in self.T for k in self.K if
+             i != j), name="c11")
         c12 = self.model.addConstrs(
-            (p[b, i, k] == self.f[b, i] * x[b, i, k] for b in self.S + self.D for i in self.N for k in self.K if
-             i != b), name='c12')
-        # c13 = self.model.addConstrs((0 <= p[i,j,k] <= self.L*x[i,j,k] for i in self.N for j in self.N for k in self.K if i != j), name='c13')
-        c13_1 = self.model.addConstrs((0 <= p[i, j, k] for i in self.N for j in self.N for k in self.K if i != j),
-                                      name='c13_1')
-        c13_2 = self.model.addConstrs(
-            (p[i, j, k] <= self.L * x[i, j, k] for i in self.N for j in self.N for k in self.K if i != j), name='c13_2')
+            (r[j] - self.L + self.f[i, j] <= M * (1 - x[i, j, k]) for i in self.D + self.S for j in
+             self.T + self.D + self.E for k in self.K if i != j), name="c12")
+        c13 = self.model.addConstrs(
+            (r[j] - self.L + self.f[i, j] >= -M * (1 - x[i, j, k]) for i in self.D + self.S for j in
+             self.T + self.D + self.E for k in self.K if i != j), name="c13")
+        c14 = self.model.addConstrs(
+            (r[i] - self.f[i, j] >= -M * (1 - x[i, j, k]) for i in self.S + self.T for j in self.D + self.E for k in
+             self.K), name="c14")
+        # c15 = self.model.addConstrs((0 <= r[i] <= self.L for i in self.T+self.E), name="c16")
+        c15_1 = self.model.addConstrs((0 <= r[i] for i in self.T + self.E), name="c15_1")
+        c15_2 = self.model.addConstrs((r[i] <= self.L for i in self.T + self.E), name="c15_2")
+        c16 = self.model.addConstrs(
+            (self.f[i, j] * x[i, j, k] <= self.L for i in self.S + self.D for j in self.D for k in self.K if i != j),
+            name="c16")
 
     def solve(self):
         # self.model.params.Heuristics = 0.0  # %age of time use a heuristic solution
@@ -178,7 +187,6 @@ class TOPF_OptimalF6:
 
     def compute_arcs_in_order(self):
         self.finalArcs = {k: [] for k in self.K}
-        self.fuel_spent = {k: 0 for k in self.K}
         self.remainingFuel = {t: 0 for t in self.T}
         for i in self.sol:
             if self.sol[i] >= 0.9 and i[0] == 'x':
@@ -208,7 +216,6 @@ class TOPF_OptimalF6:
             for arc in tempArcsInOrder[k]:
                 newArc = tuple((arc[0], arc[1]))
                 self.arcsInOrder[k].append(newArc)
-                self.fuel_spent[k] += self.c[(arc[0], arc[1])]
 
     def convert_to_nodes_in_order(self):
         self.nodesInOrder = {k: [] for k in self.K}
@@ -217,6 +224,3 @@ class TOPF_OptimalF6:
             nodeBasedPath.append(self.arcsInOrder[k][-1][1])
             self.nodesInOrder[k] = nodeBasedPath[:]
         self.nodesInOrderList = [list(i) for i in self.nodesInOrder.values()]
-
-    def get_fuel_spent(self):
-        return self.fuel_spent

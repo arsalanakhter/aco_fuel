@@ -99,6 +99,10 @@ class MapPlotter:
                     mode='lines'))
 
     def _update_best_paths(self, best_paths):
+        '''
+
+        :param best_paths: a list of lists of best paths for each ant/robot
+        '''
         for n in range(self.n_ants):
             path_coords = self.graph.nodes[best_paths[n], :]
             self.fig.update_traces(selector=dict(name='Best Path Ant '+str(n)),
