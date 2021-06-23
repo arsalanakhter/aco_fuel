@@ -20,6 +20,7 @@ class TOPF_ACO_AntPool:
         self.visited_g = [0 for _ in range(self.g.num_nodes())]
         self.best_set_of_paths = []
         self.total_distance_of_best_set_of_paths = sys.maxsize
+        self.best_pool_fuel_spent = {}
 
     def reset(self):
         self.visited_g = [0 for _ in range(self.g.num_nodes())]
@@ -90,13 +91,14 @@ class TOPF_ACO_AntPool:
             paths.append(ant.get_path())
         # Check if the global set of paths found is better than the current set for this pool
         total_dist_this_run = 0
-        pool_fuel_spent = {ant.id:ant.distance_travelled for ant in self.ants}
+        pool_fuel_spent_this_run = {ant.id: ant.distance_travelled for ant in self.ants}
         for ant in self.ants:
             total_dist_this_run += ant.distance_travelled
         if total_dist_this_run < self.total_distance_of_best_set_of_paths:
             self.total_distance_of_best_set_of_paths = total_dist_this_run
             self.best_set_of_paths = paths[:]
-        return self.best_set_of_paths, pool_fuel_spent
+            self.best_pool_fuel_spent = pool_fuel_spent_this_run
+        return self.best_set_of_paths, self.total_distance_of_best_set_of_paths, self.best_pool_fuel_spent
 
     def can_reach_final_node(self, ant):
         """If there are no feasible nodes left, can the ant reach the final node? We assume the

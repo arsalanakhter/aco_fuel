@@ -21,18 +21,20 @@ def main(streamlit_viz=0):
     if streamlit_viz:
         n_depots = st.sidebar.slider("Number of depots", 1, 10, 1)
         n_tasks = st.sidebar.slider("Number of tasks", 1, 10, 1)
-        n_pools = st.sidebar.slider("Number of ant pools", 1, 20, 1)
+        n_pools = st.sidebar.slider("Number of ant pools", 1, 30, 1)
         n_ants = st.sidebar.slider("Number of ants per pool", 1, 10, 1)
         max_ant_fuel = st.sidebar.slider("Maximum Ant Fuel", 1.0, 10.0, 0.5)
         max_mission_time = st.sidebar.slider("Maximum mission time", 1, 100, 1)
+        n_iterations = st.sidebar.slider("Number Of ACO Iterations", 1, 100, 1)
 
     else:
-        n_depots = 1
-        n_tasks = 1
+        n_depots = 4
+        n_tasks = 7
         n_pools = 1
         n_ants = 2
-        max_ant_fuel = 10
-        max_mission_time = 1000
+        max_ant_fuel = 5.19
+        max_mission_time = 60
+        n_iterations = 1
 
     g = Graph(rng,  # random number generator
               n_depots,  # No. of depots
@@ -41,12 +43,12 @@ def main(streamlit_viz=0):
 
 
     st.header("ACO")
-#    aco_fuel_placeholder = st.empty()
+    aco_fuel_placeholder = st.empty()
     plotter_aco = MapPlotter(g, n_ants)
     plotter_aco.init_plot()
 
     st.header("Optimal")
-#    optimal_fuel_placeholder = st.empty()
+    optimal_fuel_placeholder = st.empty()
     plotter_optimal = MapPlotter(g, n_ants)
     plotter_optimal.init_plot()
 
@@ -55,7 +57,7 @@ def main(streamlit_viz=0):
     optimal_sol.write_lp_and_sol_to_disk()
     optimal_best_paths = optimal_sol.read_best_paths()
     plotter_optimal.update(None, optimal_best_paths)  # None because no pheromone information here
-#    optimal_fuel_placeholder.text(optimal_sol.get_fuel_spent())
+    optimal_fuel_placeholder.text(optimal_sol.get_fuel_spent())
 
 
     aco = TOPF_ACO_Shared(
@@ -73,9 +75,9 @@ def main(streamlit_viz=0):
     )
     st.header("Console Output:")
     with st_stdout("code"):
-        pool_fuel = aco.run(1,  # number of iterations
+        pool_fuel = aco.run(n_iterations,  # number of iterations
                 plotter_aco.update)
-#        aco_fuel_placeholder.text(pool_fuel)
+        aco_fuel_placeholder.text(pool_fuel)
 
 
 if __name__ == '__main__':
