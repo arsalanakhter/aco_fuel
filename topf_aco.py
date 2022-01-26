@@ -34,9 +34,14 @@ class TOPF_ACO:
         for ant in pool.ants:
             path = ant.path
             for i in range(len(path) - 1):
-                delta_pheromone_value = self.pheromone_growth_constant / ant.distance_travelled
-                self.pheromone_matrix[path[i], path[i + 1], ant.id] += delta_pheromone_value
-                self.pheromone_matrix[path[i + 1], path[i], ant.id] += delta_pheromone_value
+                # Handle the case for division by zero
+                delta_pheromone_value = \
+                    self.pheromone_growth_constant / (
+                            ant.distance_travelled + 0.000001)
+                self.pheromone_matrix[path[i], path[i + 1],
+                                      ant.id] += delta_pheromone_value
+                self.pheromone_matrix[path[i + 1], path[i],
+                                      ant.id] += delta_pheromone_value
 
     def run(self, max_iterations, plot_update_func):
         """Performs a full run"""
@@ -46,8 +51,10 @@ class TOPF_ACO:
         for t in range(0, max_iterations):
             for pool in self.pools:
                 pool.reset()
-                # TODO: This line may only get the best path from the last pool
-                best_paths, best_paths_length, pool_fuel = pool.compute_paths(self.rng, self.pheromone_matrix)
+                # TODO: This line may only get the best path from the
+                #  last pool
+                best_paths, best_paths_length, pool_fuel = \
+                pool.compute_paths(self.rng, self.pheromone_matrix)
                 if best_paths_length < self.best_paths_length_global:
                     self.best_paths_global = best_paths
                     self.best_paths_length_global = best_paths_length

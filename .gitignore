@@ -1,3 +1,6 @@
 __pycache__/
 *.lp
 *.sol
+data/
+sol/
+.idea/

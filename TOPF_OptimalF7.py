@@ -139,7 +139,7 @@ class TOPF_OptimalF7:
         # self.model.params.Cuts = 0  # Do not use cuts, except lazy constraints
         # model.params.MIPGapAbs = 0.0005
         # self.model.params.TimeLimit = 30
-        self.model.Params.MIPGap = 1e-3
+        self.model.Params.MIPGap = 1e-4
         self.model.optimize()
 
         return self.model
@@ -187,6 +187,7 @@ class TOPF_OptimalF7:
 
     def compute_arcs_in_order(self):
         self.finalArcs = {k: [] for k in self.K}
+        self.fuel_spent = {k: 0 for k in self.K}
         self.remainingFuel = {t: 0 for t in self.T}
         for i in self.sol:
             if self.sol[i] >= 0.9 and i[0] == 'x':
@@ -216,6 +217,7 @@ class TOPF_OptimalF7:
             for arc in tempArcsInOrder[k]:
                 newArc = tuple((arc[0], arc[1]))
                 self.arcsInOrder[k].append(newArc)
+                self.fuel_spent[k] += self.c[(arc[0], arc[1])]
 
     def convert_to_nodes_in_order(self):
         self.nodesInOrder = {k: [] for k in self.K}
@@ -224,3 +226,6 @@ class TOPF_OptimalF7:
             nodeBasedPath.append(self.arcsInOrder[k][-1][1])
             self.nodesInOrder[k] = nodeBasedPath[:]
         self.nodesInOrderList = [list(i) for i in self.nodesInOrder.values()]
+
+    def get_fuel_spent(self):
+        return self.fuel_spent

@@ -1,14 +1,17 @@
 class TOPF_ACO_Ant:
 
-    def __init__(self, id, start_node, fuelf, timef, max_fuel, max_time):
+    def __init__(self, id, start_node, fuelf, timef, max_fuel,
+                 max_time):
         self.id = id
         self.start_node = start_node
         self.fuelf = fuelf
         self.timef = timef
         self.max_time = max_time
         self.max_fuel = max_fuel
-        self.alpha = 0.5  # Parameter to weigh the effect of pheromone on choosing next node
-        self.beta = 1.2  # Parameter to weigh the effect of distance on choosing next node
+        self.alpha = 0.5  # Parameter to weigh the effect of
+        # pheromone on choosing next node
+        self.beta = 1.2  # Parameter to weigh the effect of distance
+        # on choosing next node
         self.reset()
 
     def reset(self):
@@ -32,18 +35,26 @@ class TOPF_ACO_Ant:
         sum_total = 0.0
 
         for possible_next_node in feasible:
-            # Check if the ant really need to go to a depot? If there is a single task node
-            # available in the feasible nodes, remove all the depot nodes
+            # Check if the ant really need to go to a depot? If there
+            # is a single task node available in the feasible nodes,
+            # remove all the depot nodes
             feasible.sort()
-            if feasible[-1] > graph.depots:  # If the last element in the sorted list is greater than depots,
-                feasible = [i for i in feasible if i > graph.depots]  # it means a feasible task exists.
-                # Hence only make the tasks to be feasible for selection now. Do not unnecessarily
-                # go to depots.
+            if feasible[-1] > graph.depots:  # If the last element in
+                # the sorted list is greater than depots,
+                feasible = [i for i in feasible if i > graph.depots]
+                # it means a feasible task exists. Hence only make
+                # the tasks to be feasible for selection now. Do not
+                # unnecessarily go to depots.
 
-            pheromone = float(pheromone_matrix[self.current_node, possible_next_node, self.id])
-            distance = float(graph.dist(self.current_node, possible_next_node))
-
-            attractiveness[possible_next_node] = pow(pheromone, self.alpha) * pow(1 / distance, self.beta)
+            pheromone = float(pheromone_matrix[self.current_node,
+                                               possible_next_node,
+                                               self.id])
+            distance = float(
+                graph.dist(self.current_node, possible_next_node))
+            # Handle the case if starting depot is picked up
+            attractiveness[possible_next_node] = pow(pheromone,
+                                                     self.alpha) * pow(
+                1 / (distance + 0.000001), self.beta)
             sum_total += attractiveness[possible_next_node]
 
         if sum_total != 0:
@@ -60,9 +71,11 @@ class TOPF_ACO_Ant:
             pick = rng.choice(list(attractiveness.keys()))
 
         # Update fuel
-        self.fuel = self.fuelf(self.fuel, graph, self.current_node, pick)
+        self.fuel = self.fuelf(self.fuel, graph, self.current_node,
+                               pick)
         # Update time
-        self.time_available = self.timef(self.time_available, graph, self.current_node, pick)
+        self.time_available = self.timef(self.time_available, graph,
+                                         self.current_node, pick)
         # Add distance travelled
         self.distance_travelled += graph.dist(self.current_node, pick)
         # Update current node
@@ -72,10 +85,12 @@ class TOPF_ACO_Ant:
 
     def done(self, graph):
         """
-        Sets this ant as done when this ant gets back to the starting location.
+        Sets this ant as done when this ant gets back to the starting
+        location.
         """
         self.path.append(self.start_node)
-        self.distance_travelled += graph.dist(self.current_node, self.start_node)
+        self.distance_travelled += graph.dist(self.current_node,
+                                              self.start_node)
         self.isdone = True
 
     def fuel_left(self):
@@ -88,11 +103,15 @@ class TOPF_ACO_Ant:
         return self.time_available
 
     def get_path(self):
-        """Return the path of the ant only if the ant is done. Else return None"""
+        """
+        Return the path of the ant only if the ant is done. Else
+        return None
+        """
         if self.isdone:
             return self.path
         return None
 
     def __str__(self):
-        return 'Ant ' + str(self.id) + f': node: {self.current_node:02d}' + f', fuel: {self.fuel:.2f}' + \
+        return 'Ant ' + str(
+            self.id) + f': node: {self.current_node:02d}' + f', fuel: {self.fuel:.2f}' + \
                ', path_so_far: ' + str(self.path)
