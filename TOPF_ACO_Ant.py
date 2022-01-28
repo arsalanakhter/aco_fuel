@@ -113,5 +113,6 @@ class TOPF_ACO_Ant:
 
     def __str__(self):
         return 'Ant ' + str(
-            self.id) + f': node: {self.current_node:02d}' + f', fuel: {self.fuel:.2f}' + \
+            self.id) + f': node: {self.current_node:02d}' +\
+               f', fuel: {self.fuel:.2f}' + \
                ', path_so_far: ' + str(self.path)

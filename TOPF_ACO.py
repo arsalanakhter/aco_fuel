@@ -14,11 +14,15 @@ from TOPF_ACO_AntPool import TOPF_ACO_AntPool
 
 class TOPF_ACO:
 
-    def __init__(self, rng, pools, robots, graph, start_node, fuelf, timef, max_fuel, max_time, heuristicf, pheromonef):
+    def __init__(self, rng, pools, robots, graph, start_node, fuelf, timef,
+                 max_fuel, max_time, heuristicf, pheromonef):
         self.rng = rng
-        self.pools = [TOPF_ACO_AntPool(i, robots, graph, start_node, fuelf, timef, max_fuel, max_time, heuristicf, pheromonef)
+        self.pools = [TOPF_ACO_AntPool(i, robots, graph, start_node, fuelf,
+                                       timef, max_fuel, max_time, heuristicf,
+                                       pheromonef)
                       for i in range(0, pools)]
-        self.pheromone_matrix = np.zeros((graph.num_nodes(), graph.num_nodes(), robots))
+        self.pheromone_matrix = np.zeros((graph.num_nodes(), graph.num_nodes(),
+                                          robots))
         self.pheromone_growth_constant = 100
         self.best_paths_global = []
         self.best_paths_length_global = sys.maxsize
@@ -29,7 +33,8 @@ class TOPF_ACO:
         pass
 
     def lay_pheromone(self, pool):
-        """Lays the pheromone after each iteration, when the ants come up with paths
+        """Lays the pheromone after each iteration, when the ants come up
+        with paths
         """
         for ant in pool.ants:
             path = ant.path
