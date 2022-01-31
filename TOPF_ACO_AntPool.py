@@ -129,6 +129,23 @@ class TOPF_ACO_AntPool:
                             # Move to a feasible depot
                             f_d = self.depots_feasible_for(ant)
                             pick = ant.move(self.g, f_d, pheromone_matrix, rng)
+                            # Check if we are at the start node, and  there is
+                            # no other node within feasible fuel range
+                            feasible = 0
+                            if pick == 0:
+                                for node in range(1, self.g.num_nodes()):
+                                    feasible = self.fuelf(ant.fuel_left(),
+                                                          self.g,
+                                                          pick,
+                                                          node)
+                                    # If even a single node can be reached with
+                                    # positive fuel value, break
+                                    if feasible >= 0:
+                                        break
+                                    else:  # Mark the ant done
+                                        ant.done(self.g)
+                                        no_of_ants_done += 1
+
                         else:
                             # Check if the ant can reach the starting
                             # location from here
