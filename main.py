@@ -20,16 +20,18 @@ def main(streamlit_viz=0):
     rng = default_rng(seed)
 
     if streamlit_viz:
-        n_depots = st.sidebar.slider("Number of depots", 1, 10, 1)
-        n_tasks = st.sidebar.slider("Number of tasks", 1, 10, 1)
-        n_pools = st.sidebar.slider("Number of ant pools", 1, 50, 1)
-        n_ants = st.sidebar.slider("Number of ants per pool", 1, 10, 1)
-        max_ant_fuel = st.sidebar.slider("Maximum Ant Fuel", 1.0, 10.0,
+        form = st.sidebar.form(key='sidebar_form')
+        submit_button = form.form_submit_button(label='Submit')
+        n_depots = form.slider("Number of depots", 1, 10, 1)
+        n_tasks = form.slider("Number of tasks", 1, 10, 1)
+        n_pools = form.slider("Number of ant pools", 1, 50, 1)
+        n_ants = form.slider("Number of ants per pool", 1, 10, 1)
+        max_ant_fuel = form.slider("Maximum Ant Fuel", 1.0, 10.0,
                                          0.5)
-        max_mission_time = st.sidebar.slider("Maximum mission time", 1,
+        max_mission_time = form.slider("Maximum mission time", 1,
                                              100, 1)
-        n_iterations = st.sidebar.slider("Number Of ACO Iterations", 1,
-                                         100, 1)
+        n_iterations = form.slider("Number Of ACO Iterations", 1,
+                                         200, 1)
 
     else:
         n_depots = 4
@@ -85,4 +87,4 @@ def main(streamlit_viz=0):
 
 
 if __name__ == '__main__':
-    main(streamlit_viz=0)
+    main(streamlit_viz=1)
