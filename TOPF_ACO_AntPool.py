@@ -129,10 +129,13 @@ class TOPF_ACO_AntPool:
                     else:
                         # Check if there is still a task that has not been
                         # visited
-                        if any(task for task in self.visited_g.values()):
+                        if not all(task for task in self.visited_g.values()):
                             # Move to a feasible depot
                             f_d = self.depots_feasible_for(ant)
                             pick = ant.move(self.g, f_d, pheromone_matrix, rng)
+                            # Since the ant has reached a feasible depot, set
+                            # the fuel to be max fuel
+                            ant.fuel = ant.max_fuel
                             # Check if we are at the start node, and  there is
                             # no other node within feasible fuel range
                             feasible = 0
