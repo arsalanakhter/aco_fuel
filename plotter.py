@@ -117,7 +117,7 @@ class MapPlotter:
                     'fuchsia', 	#ff00ff
                     'green', 	#008000
                     'olive', 	#808000
-                    'yellow', 	#ffff00
+                    # 'yellow', #ffff00
                     'navy', 	#000080
                     'blue', 	#0000ff
                     'teal', 	#008080

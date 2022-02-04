@@ -28,12 +28,14 @@ class TOPF_ACO_AntPool:
         self.best_set_of_paths = []
         self.total_distance_of_best_set_of_paths = sys.maxsize
         self.best_pool_fuel_spent = {}
+        self.no_of_ants_done = 0
 
     def reset(self):
         self.visited_g = {idx: 0 for idx in range(self.g.depots,
                                                   self.g.num_nodes())}
         for ant in self.ants:
             ant.reset()
+        self.no_of_ants_done = 0
 
     def tasks_feasible_for(self, ant):
         """Returns the list of tasks that the ant can pick"""
@@ -82,8 +84,11 @@ class TOPF_ACO_AntPool:
         # Also remove those depots from which the ant cannot
         # reach a depot with fuel_left after visiting current
         # feasible depots
+        # (Because we do not assume that all depots are within max_fuel reach
+        # from each other)
         for n in feasible_depots:
-            fuel_at_n = self.fuelf(ant.fuel_left(), self.g, ant.current_node, n)
+            fuel_at_n = ant.max_fuel  # Since the ant is already at a depot,
+            # it is at max fuel.
             for i in range(self.g.depots):
                 if self.fuelf(fuel_at_n, self.g, n, i) < 0:
                     to_be_removed.append(n)
@@ -113,9 +118,8 @@ class TOPF_ACO_AntPool:
         #       If all tasks have not been visited, randomly move to
         # a feasible depot
         paths = []
-        no_of_ants_done = 0
         # Continue computing paths until all ants are done
-        while no_of_ants_done != len(self.ants):
+        while self.no_of_ants_done != len(self.ants):
             for ant in self.ants:
                 if not ant.isdone:
                     f_t = self.tasks_feasible_for(ant)
@@ -125,7 +129,7 @@ class TOPF_ACO_AntPool:
                     else:
                         # Check if there is still a task that has not been
                         # visited
-                        if not any(task for task in self.visited_g.values()):
+                        if any(task for task in self.visited_g.values()):
                             # Move to a feasible depot
                             f_d = self.depots_feasible_for(ant)
                             pick = ant.move(self.g, f_d, pheromone_matrix, rng)
@@ -144,14 +148,14 @@ class TOPF_ACO_AntPool:
                                         break
                                     else:  # Mark the ant done
                                         ant.done(self.g)
-                                        no_of_ants_done += 1
+                                        self.no_of_ants_done += 1
 
                         else:
                             # Check if the ant can reach the starting
                             # location from here
                             if self.can_reach_final_node(ant):
                                 ant.done(self.g)
-                                no_of_ants_done += 1
+                                self.no_of_ants_done += 1
                             else:
                                 raise ValueError("Ant cannot reach final "
                                                  "node from current "
@@ -181,7 +185,7 @@ class TOPF_ACO_AntPool:
         If there are no feasible nodes left, can the ant reach the
         final node? We assume the start node to be the final node for
         each ant to reach back, and we check based on time left,
-        (Do we need to check fuel_compatibility?)
+        (Do we need to check fuel_compatibility? Yes)
 
          :param ant: Ant object
          """

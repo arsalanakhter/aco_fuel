@@ -33,12 +33,12 @@ def main(streamlit_viz=0):
 
     else:
         n_depots = 4
-        n_tasks = 7
-        n_pools = 33
+        n_tasks = 6
+        n_pools = 21
         n_ants = 1
-        max_ant_fuel = 10
-        max_mission_time = 72
-        n_iterations = 5
+        max_ant_fuel = 2.0
+        max_mission_time = 47
+        n_iterations = 28
 
     g = Graph(rng,  # random number generator
               n_depots,  # No. of depots
@@ -85,4 +85,4 @@ def main(streamlit_viz=0):
 
 
 if __name__ == '__main__':
-    main(streamlit_viz=1)
+    main(streamlit_viz=0)
