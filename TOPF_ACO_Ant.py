@@ -8,7 +8,7 @@ class TOPF_ACO_Ant:
         self.timef = timef
         self.max_time = max_time
         self.max_fuel = max_fuel
-        self.alpha = 0.05  # Parameter to weigh the effect of
+        self.alpha = 0.2  # Parameter to weigh the effect of
         # pheromone on choosing next node
         self.beta = 1.2  # Parameter to weigh the effect of distance
         # on choosing next node
@@ -113,6 +113,7 @@ class TOPF_ACO_Ant:
 
     def __str__(self):
         return 'Ant ' + str(
-            self.id) + f': node: {self.current_node:02d}' +\
+            self.id) + f': node: {self.current_node:02d}' + \
                f', fuel: {self.fuel:.2f}' + \
-               ', path_so_far: ' + str(self.path)
+               ', path_so_far: ' + str(self.path) + \
+               f', Dist Travelled: {self.distance_travelled:0.2f}'

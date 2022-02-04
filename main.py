@@ -31,7 +31,7 @@ def main(streamlit_viz=0):
         max_mission_time = form.slider("Maximum mission time", 1,
                                              100, 1)
         n_iterations = form.slider("Number Of ACO Iterations", 1,
-                                         200, 1)
+                                         500, 1)
 
     else:
         n_depots = 4
