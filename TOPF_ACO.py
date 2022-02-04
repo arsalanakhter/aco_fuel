@@ -28,7 +28,6 @@ class TOPF_ACO:
         self.best_paths_length_global = sys.maxsize
         self.pool_fuel_best_global = {}
 
-
     def decay_pheromone(self):
         pass
 
@@ -59,7 +58,7 @@ class TOPF_ACO:
                 # TODO: This line may only get the best path from the
                 #  last pool
                 best_paths, best_paths_length, pool_fuel = \
-                pool.compute_paths(self.rng, self.pheromone_matrix)
+                    pool.compute_paths(self.rng, self.pheromone_matrix)
                 if best_paths_length < self.best_paths_length_global:
                     self.best_paths_global = best_paths
                     self.best_paths_length_global = best_paths_length
@@ -68,7 +67,8 @@ class TOPF_ACO:
             for pool in self.pools:
                 self.lay_pheromone(pool)
             print(f'Iter:{t}', self)
-            print(f'Best Paths: {best_paths}')
+            print(f'Best Path(s): {self.best_paths_global}')
+            print(f'Best Path(s) Lengths: {self.best_paths_length_global}\n\n')
             plot_update_func(self.pheromone_matrix, self.best_paths_global)
 
         return pool_fuel
@@ -76,5 +76,5 @@ class TOPF_ACO:
     def __str__(self):
         s = "TOPF_ACO\n"
         for p in self.pools:
-            s += str(p) + "\n"
+            s += str(p)
         return s
