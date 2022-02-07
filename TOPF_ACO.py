@@ -31,7 +31,7 @@ class TOPF_ACO:
     def decay_pheromone(self):
         pass
 
-    def lay_pheromone(self, pool):
+    def lay_pheromone(self, pool, graph):
         """Lays the pheromone after each iteration, when the ants come up
         with paths
         """
@@ -46,6 +46,10 @@ class TOPF_ACO:
                                       ant.id] += delta_pheromone_value
                 self.pheromone_matrix[path[i + 1], path[i],
                                       ant.id] += delta_pheromone_value
+            # Also, ensure no pheromone get laid on a node, i.e. there are
+            # no self loops
+            for i in range(graph.num_nodes()):
+                self.pheromone_matrix[i, i, ant.id] = 0
 
     def run(self, max_iterations, plot_update_func):
         """Performs a full run"""
