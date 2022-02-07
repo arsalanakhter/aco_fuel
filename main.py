@@ -26,12 +26,12 @@ def main(streamlit_viz=0):
         n_tasks = form.slider("Number of tasks", 1, 10, 1)
         n_pools = form.slider("Number of ant pools", 1, 50, 1)
         n_ants = form.slider("Number of ants per pool", 1, 10, 1)
-        max_ant_fuel = form.slider("Maximum Ant Fuel", 1.0, 10.0,
+        max_ant_fuel = form.slider("Maximum Ant Fuel", 1.0, 5.0,
                                          0.5)
-        max_mission_time = form.slider("Maximum mission time", 1,
-                                             100, 1)
+        max_mission_time = form.slider("Maximum mission time", 1.0,
+                                             5.0, 0.5)
         n_iterations = form.slider("Number Of ACO Iterations", 1,
-                                         500, 1)
+                                         50, 1)
 
     else:
         n_depots = 4
@@ -87,4 +87,4 @@ def main(streamlit_viz=0):
 
 
 if __name__ == '__main__':
-    main(streamlit_viz=0)
+    main(streamlit_viz=1)

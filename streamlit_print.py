@@ -6,6 +6,7 @@ except ModuleNotFoundError:
     from streamlit.report_thread import (  # type: ignore
         get_report_ctx as get_script_run_ctx,
     )
+from streamlit.script_run_context import SCRIPT_RUN_CONTEXT_ATTR_NAME
 from threading import current_thread
 from contextlib import contextmanager
 from io import StringIO
@@ -24,6 +25,7 @@ def st_redirect(src, dst):
 
         def new_write(b):
             if getattr(current_thread(), get_script_run_ctx().session_id, None):
+            #if getattr(current_thread(), SCRIPT_RUN_CONTEXT_ATTR_NAME,    None):
                 buffer.write(b + '')
                 output_func(buffer.getvalue() + '')
             else:

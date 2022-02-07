@@ -140,6 +140,26 @@ class TOPF_ACO_AntPool:
                             # no other node within feasible fuel range
                             feasible = 0
                             if pick == 0:
+                                # First check if enough mission time is still
+                                # available for a visit to any location
+                                # (TODO: and back?)
+                                for node in range(self.g.depots,
+                                                  self.g.num_nodes()):
+                                    feasible_task = self.timef(ant.time_left(),
+                                                               self.g,
+                                                               pick,
+                                                               node)
+                                    # If even a single task can be reached with
+                                    # positive time value, break
+                                    if feasible_task >= 0:
+                                        break
+                                    else:
+                                        # It means not enough mission time is
+                                        # left
+                                        # Mark the ant done
+                                        ant.done(self.g)
+                                        self.no_of_ants_done += 1
+                                        break
                                 for node in range(1, self.g.num_nodes()):
                                     feasible = self.fuelf(ant.fuel_left(),
                                                           self.g,
@@ -150,8 +170,9 @@ class TOPF_ACO_AntPool:
                                     if feasible >= 0:
                                         break
                                     else:  # Mark the ant done
-                                        ant.done(self.g)
-                                        self.no_of_ants_done += 1
+                                        if not ant.isdone:
+                                            ant.done(self.g)
+                                            self.no_of_ants_done += 1
 
                         else:
                             # Check if the ant can reach the starting
