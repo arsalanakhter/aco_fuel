@@ -39,7 +39,7 @@ def main(streamlit_viz=0):
         n_pools = 21
         n_ants = 1
         max_ant_fuel = 2.0
-        max_mission_time = 47
+        max_mission_time = 4
         n_iterations = 28
 
     g = Graph(rng,  # random number generator
@@ -82,9 +82,9 @@ def main(streamlit_viz=0):
     st.header("Console Output:")
     with st_stdout("code"):
         pool_fuel = aco.run(n_iterations,  # number of iterations
-                            plotter_aco.update)
+                            plotter_aco.update, g)
         aco_fuel_placeholder.text(pool_fuel)
 
 
 if __name__ == '__main__':
-    main(streamlit_viz=1)
+    main(streamlit_viz=0)
