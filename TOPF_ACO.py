@@ -73,7 +73,7 @@ class TOPF_ACO:
                   f'{self.best_paths_total_length_global:0.2f}\n\n')
             plot_update_func(self.pheromone_matrix, self.best_paths_global)
 
-        return pool_fuel, self.best_paths_global
+        return self.pool_fuel_best_global, self.best_paths_global
 
     def __str__(self):
         s = "TOPF_ACO\n"
