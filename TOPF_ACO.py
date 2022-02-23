@@ -53,6 +53,7 @@ class TOPF_ACO:
 
     def run(self, max_iterations, plot_update_func, graph):
         """Performs a full run"""
+        best_paths = []
         pool_fuel = {}
         for t in range(0, max_iterations):
             for pool in self.pools:
@@ -72,7 +73,7 @@ class TOPF_ACO:
                   f'{self.best_paths_total_length_global:0.2f}\n\n')
             plot_update_func(self.pheromone_matrix, self.best_paths_global)
 
-        return pool_fuel
+        return pool_fuel, self.best_paths_global
 
     def __str__(self):
         s = "TOPF_ACO\n"

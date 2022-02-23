@@ -27,20 +27,20 @@ def main(streamlit_viz=0):
         n_pools = form.slider("Number of ant pools", 1, 50, 1)
         n_ants = form.slider("Number of ants per pool", 1, 10, 1)
         max_ant_fuel = form.slider("Maximum Ant Fuel", 1.0, 5.0,
-                                         0.5)
+                                   0.5)
         max_mission_time = form.slider("Maximum mission time", 1.0,
-                                             5.0, 0.5)
+                                       5.0, 0.5)
         n_iterations = form.slider("Number Of ACO Iterations", 1,
-                                         50, 1)
+                                   50, 1)
 
     else:
-        n_depots = 4
-        n_tasks = 6
-        n_pools = 21
-        n_ants = 1
-        max_ant_fuel = 2.0
-        max_mission_time = 4
-        n_iterations = 28
+        n_depots = 3
+        n_tasks = 7
+        n_pools = 18
+        n_ants = 2
+        max_ant_fuel = 1.89
+        max_mission_time = 2.90
+        n_iterations = 29
 
     g = Graph(rng,  # random number generator
               n_depots,  # No. of depots
@@ -49,11 +49,13 @@ def main(streamlit_viz=0):
 
     st.header("ACO")
     aco_fuel_placeholder = st.empty()
+    aco_path_placeholder = st.empty()
     plotter_aco = MapPlotter(g, n_ants)
     plotter_aco.init_plot()
 
-    st.header("Optimal")
+    st.header("MILP")
     optimal_fuel_placeholder = st.empty()
+    optimal_path_placeholder = st.empty()
     plotter_optimal = MapPlotter(g, n_ants)
     plotter_optimal.init_plot()
 
@@ -65,6 +67,7 @@ def main(streamlit_viz=0):
     plotter_optimal.update(None, optimal_best_paths)  # None because
     # no pheromone information here
     optimal_fuel_placeholder.text(optimal_sol.get_fuel_spent())
+    optimal_path_placeholder.text(optimal_best_paths)
 
     aco = TOPF_ACO_Shared(
         rng,  # random number generator
@@ -79,11 +82,12 @@ def main(streamlit_viz=0):
         None,  # heuristic function
         pheromonef_lay  # pheromone function
     )
-    st.header("Console Output:")
-    with st_stdout("code"):
-        pool_fuel = aco.run(n_iterations,  # number of iterations
-                            plotter_aco.update, g)
-        aco_fuel_placeholder.text(pool_fuel)
+    # st.header("Console Output:")
+    # with st_stdout("code"):
+    pool_fuel, best_paths = aco.run(n_iterations,  # number of iterations
+                                    plotter_aco.update, g)
+    aco_fuel_placeholder.text(pool_fuel)
+    aco_path_placeholder.text(best_paths)
 
 
 if __name__ == '__main__':
