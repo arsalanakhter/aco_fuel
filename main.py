@@ -26,10 +26,10 @@ def main(streamlit_viz=0):
         n_tasks = form.slider("Number of tasks", 1, 10, 1)
         n_pools = form.slider("Number of ant pools", 1, 50, 1)
         n_ants = form.slider("Number of ants per pool", 1, 10, 1)
-        max_ant_fuel = form.slider("Maximum Ant Fuel", 1.0, 5.0,
-                                   0.5)
-        max_mission_time = form.slider("Maximum mission time", 1.0,
-                                       5.0, 0.5)
+        max_ant_fuel = form.slider("Maximum Ant Fuel", 1, 500,
+                                   1)
+        max_mission_time = form.slider("Maximum mission time", 1,
+                                       500, 1)
         n_iterations = form.slider("Number Of ACO Iterations", 1,
                                    50, 1)
 
@@ -68,6 +68,8 @@ def main(streamlit_viz=0):
     # no pheromone information here
     optimal_fuel_placeholder.text(optimal_sol.get_fuel_spent())
     optimal_path_placeholder.text(optimal_best_paths)
+
+
 
     aco = TOPF_ACO_Shared(
         rng,  # random number generator

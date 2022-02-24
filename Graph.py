@@ -8,7 +8,7 @@ class Graph:
 
     def __init__(self, rng, depots, tasks):
         self.rng = rng
-        self.nodes = rng.random((depots + tasks, 2))
+        self.nodes = 100*rng.random((depots + tasks, 2))
         self.depots = depots
         self.tasks = tasks
         self.adj_dist = np.zeros((depots + tasks, depots + tasks))
