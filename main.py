@@ -36,10 +36,10 @@ def main(streamlit_viz=0):
     else:
         n_depots = 3
         n_tasks = 7
-        n_pools = 18
+        n_pools = 17
         n_ants = 2
-        max_ant_fuel = 189
-        max_mission_time = 290
+        max_ant_fuel = 98
+        max_mission_time = 327
         n_iterations = 13
 
     g = Graph(rng,  # random number generator
