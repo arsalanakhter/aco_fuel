@@ -4,9 +4,6 @@ import warnings
 import networkx as nx
 import csv
 import regex as re
-import sys
-
-from concorde.tsp import TSPSolver
 
 
 class TOPF_OptimalF7:
@@ -180,9 +177,8 @@ class TOPF_OptimalF7:
                     _, self.runtime = line[0].split(':')
         self.compute_arcs_in_order()
         self.convert_to_nodes_in_order()
-        self.create_tsp_corrected_tours()
         g_mapped_nodes_in_order_list = []
-        for q in self.tspCorrectedNodesInOrderList:
+        for q in self.nodesInOrderList:
             path = []
             for i in q:
                 path.append(self.N_g_mapping[i])
@@ -191,6 +187,7 @@ class TOPF_OptimalF7:
 
     def compute_arcs_in_order(self):
         self.finalArcs = {k: [] for k in self.K}
+        self.fuel_spent = {k: 0 for k in self.K}
         self.remainingFuel = {t: 0 for t in self.T}
         for i in self.sol:
             if self.sol[i] >= 0.9 and i[0] == 'x':
@@ -220,6 +217,7 @@ class TOPF_OptimalF7:
             for arc in tempArcsInOrder[k]:
                 newArc = tuple((arc[0], arc[1]))
                 self.arcsInOrder[k].append(newArc)
+                self.fuel_spent[k] += self.c[(arc[0], arc[1])]
 
     def convert_to_nodes_in_order(self):
         self.nodesInOrder = {k: [] for k in self.K}
@@ -227,30 +225,7 @@ class TOPF_OptimalF7:
             nodeBasedPath = [arc[0] for arc in self.arcsInOrder[k]]
             nodeBasedPath.append(self.arcsInOrder[k][-1][1])
             self.nodesInOrder[k] = nodeBasedPath[:]
+        self.nodesInOrderList = [list(i) for i in self.nodesInOrder.values()]
 
     def get_fuel_spent(self):
         return self.fuel_spent
-
-    def create_tsp_corrected_tours(self):
-        self.tsp_corrected_tour_nodes = {k: [] for k in self.K}
-        self.fuel_spent = {k: 0 for k in self.K}
-        # Create data for TSP Solver
-        for k in self.K:
-            nodes = [node for node in self.nodesInOrder[k]]
-            # Check if there are enough nodes for concorde to solve
-            if nodes == ['S0', 'D0', 'E0'] or len(nodes) < 3:
-                print ("No Nodes exist for Concorde to solve!")
-                break
-            X = [self.N_loc[node][0] for node in self.nodesInOrder[k]]
-            Y = [self.N_loc[node][1] for node in self.nodesInOrder[k]]
-            t_solver_map = {i: node for i, node in zip(range(len(nodes)),
-                                                       self.nodesInOrder[k])}
-            solver_t = TSPSolver.from_data(X, Y, norm="EUC_2D")
-            tour_data = solver_t.solve()
-            mapped_tour = [t_solver_map[i] for i in tour_data.tour]
-            self.tsp_corrected_tour_nodes[k] = mapped_tour
-            # Compute the new fuel spent
-            for arc_0, arc_1 in zip(mapped_tour[:-1], mapped_tour[1:]):
-                self.fuel_spent[k] += self.c[(arc_0, arc_1)]
-        self.tspCorrectedNodesInOrderList = [list(i)
-                                             for i in self.tsp_corrected_tour_nodes.values()]

@@ -38,9 +38,9 @@ def main(streamlit_viz=0):
         n_tasks = 7
         n_pools = 18
         n_ants = 2
-        max_ant_fuel = 189
-        max_mission_time = 290
-        n_iterations = 13
+        max_ant_fuel = 1.89
+        max_mission_time = 2.90
+        n_iterations = 29
 
     g = Graph(rng,  # random number generator
               n_depots,  # No. of depots
