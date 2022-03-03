@@ -1,3 +1,4 @@
+import numpy as np
 from gurobipy import *
 import copy
 import warnings
@@ -6,7 +7,8 @@ import csv
 import regex as re
 import sys
 
-from concorde.tsp import TSPSolver
+
+from concorde import Problem, run_concorde
 
 
 class TOPF_OptimalF7:
@@ -180,14 +182,20 @@ class TOPF_OptimalF7:
                     _, self.runtime = line[0].split(':')
         self.compute_arcs_in_order()
         self.convert_to_nodes_in_order()
-        self.create_tsp_corrected_tours()
-        g_mapped_nodes_in_order_list = []
-        for q in self.tspCorrectedNodesInOrderList:
+        g_mapped_nodes_in_order_list_before_correction = []
+        for q in self.nodesInOrderList:
             path = []
             for i in q:
                 path.append(self.N_g_mapping[i])
-            g_mapped_nodes_in_order_list.append(path)
-        return g_mapped_nodes_in_order_list
+            g_mapped_nodes_in_order_list_before_correction.append(path)
+        self.create_tsp_corrected_tours()
+        g_mapped_nodes_in_order_list = []
+        for q in self.tspCorrectedNodesInOrderList:
+           path = []
+           for i in q:
+               path.append(self.N_g_mapping[i])
+           g_mapped_nodes_in_order_list.append(path)
+        return  g_mapped_nodes_in_order_list_before_correction
 
     def compute_arcs_in_order(self):
         self.finalArcs = {k: [] for k in self.K}
@@ -214,12 +222,16 @@ class TOPF_OptimalF7:
             # print("Edges in G["+k+"]: ", G[k].edges(data=True))
         # Now compute the paths in the above graphs
         self.arcsInOrder = {k: [] for k in self.K}
+        self.fuel_spent_before_tsp_correction = {k: 0 for k in self.K}
         tempArcsInOrder = {k: [] for k in self.K}
         for k in self.K:
             tempArcsInOrder[k] = list(nx.edge_dfs(G[k], source=self.S[0]))
             for arc in tempArcsInOrder[k]:
                 newArc = tuple((arc[0], arc[1]))
                 self.arcsInOrder[k].append(newArc)
+                self.fuel_spent_before_tsp_correction[k] += self.c[(arc[0],
+                                                                    arc[1])]
+
 
     def convert_to_nodes_in_order(self):
         self.nodesInOrder = {k: [] for k in self.K}
@@ -227,9 +239,10 @@ class TOPF_OptimalF7:
             nodeBasedPath = [arc[0] for arc in self.arcsInOrder[k]]
             nodeBasedPath.append(self.arcsInOrder[k][-1][1])
             self.nodesInOrder[k] = nodeBasedPath[:]
+        self.nodesInOrderList = [list(i) for i in self.nodesInOrder.values()]
 
     def get_fuel_spent(self):
-        return self.fuel_spent
+        return self.fuel_spent, self.fuel_spent_before_tsp_correction
 
     def create_tsp_corrected_tours(self):
         self.tsp_corrected_tour_nodes = {k: [] for k in self.K}
@@ -239,23 +252,63 @@ class TOPF_OptimalF7:
             nodes = [node for node in self.nodesInOrder[k]]
             # Check if there are enough nodes for concorde to solve
             if nodes == ['S0', 'D0', 'E0'] or len(nodes) < 3:
-                print ("No Nodes exist for Concorde to solve!")
+                print("No Nodes exist for Concorde to solve!")
                 break
-            t_solver_map = {i: node for i, node in zip(range(len(nodes)),
-                                                       self.nodesInOrder[k])}
             # Remove E0, we'll later add it. This is possibly due to an
             # implementation quirk in the MILP formulation, where E0 also
             # acts as a depot.
-            nodes.remove('E0')
-            X = [self.N_loc[node][0] for node in self.nodesInOrder[k]]
-            Y = [self.N_loc[node][1] for node in self.nodesInOrder[k]]
-            solver_t = TSPSolver.from_data(X, Y, norm="EUC_2D")
-            tour_data = solver_t.solve()
-            mapped_tour = [t_solver_map[i] for i in tour_data.tour]
-            self.tsp_corrected_tour_nodes[k] = mapped_tour
-            self.tsp_corrected_tour_nodes[k].append('E0')
+            # nodes.remove('E0')
+            # Create path fragments from each depot to each depot. Find a tsp
+            # tour on these fragments
+            path_fragments = []
+            fragment = []
+            for i in nodes:
+                if i not in self.D + self.E:
+                    fragment.append(i)
+                else:
+                    fragment.append(i)
+                    path_fragments.append(fragment)
+                    # Reinitialize
+                    fragment = []
+                    fragment.append(i)
+            for f in path_fragments:
+                if len(f[1:-1]) <= 3: # this means no need to optimize this fragment
+                    for node in f:
+                        self.tsp_corrected_tour_nodes[k].append(node)
+                    continue
+                t_solver_map = {}
+                for i, node in zip(range(len(f)), f):
+                    if node not in list(t_solver_map.values()):
+                        t_solver_map[i] = node
+                t_solver_map[len(t_solver_map)] = 'Dummy'
+                inv_t_solver_map = {v: i for i, v in t_solver_map.items()}
+                # Create Distance Matrix
+                dist_matrix = np.full((len(t_solver_map)+1,
+                                       len(t_solver_map)+1),
+                                      np.inf)
+                for i, n1 in zip(range(len(f)), f):
+                    for j, n2 in zip(range(len(f)), f):
+                        if n1 != n2:
+                            dist_matrix[i, j] = self.c[(n1, n2)]
+                # add a dummy node in dist matrix, by adding 0 weights to start
+                # end nodes, and a big_number to else
+                start_node = f[0]
+                end_node = f[-1]
+                dist_matrix[len(f), inv_t_solver_map[start_node]] = \
+                        dist_matrix[inv_t_solver_map[start_node], len(f)] = 0
+                dist_matrix[len(f), inv_t_solver_map[end_node]] = \
+                        dist_matrix[inv_t_solver_map[end_node], len(f)] = 0
+                problem = Problem.from_matrix(dist_matrix)
+                tour_data = run_concorde(problem)
+                mapped_tour = [t_solver_map[i] for i in tour_data.tour]
+                for node in mapped_tour:
+                    if node != 'Dummy':
+                        self.tsp_corrected_tour_nodes[k].append(node)
+                    else:
+                        continue
             # Compute the new fuel spent
-            for arc_0, arc_1 in zip(mapped_tour[:-1], mapped_tour[1:]):
+            for arc_0, arc_1 in zip(self.tsp_corrected_tour_nodes[k][:-1],
+                                    self.tsp_corrected_tour_nodes[k][1:]):
                 if arc_0 != arc_1:
                     self.fuel_spent[k] += self.c[(arc_0, arc_1)]
         self.tspCorrectedNodesInOrderList = [list(i)

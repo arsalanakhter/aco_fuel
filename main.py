@@ -38,9 +38,9 @@ def main(streamlit_viz=0):
         n_tasks = 7
         n_pools = 17
         n_ants = 2
-        max_ant_fuel = 98
-        max_mission_time = 327
-        n_iterations = 13
+        max_ant_fuel = 323
+        max_mission_time = 384
+        n_iterations = 1
 
     g = Graph(rng,  # random number generator
               n_depots,  # No. of depots
@@ -59,15 +59,30 @@ def main(streamlit_viz=0):
     plotter_optimal = MapPlotter(g, n_ants)
     plotter_optimal.init_plot()
 
+    st.header("TSP-Corrected MILP")
+    optimal_fuel_placeholder2 = st.empty()
+    optimal_path_placeholder2 = st.empty()
+    plotter_optimal2 = MapPlotter(g, n_ants)
+    plotter_optimal2.init_plot()
+
+
     optimal_sol = TOPF_OptimalF7(g, n_ants, max_ant_fuel,
                                  max_mission_time, seed)
     optimal_sol.solve()
     optimal_sol.write_lp_and_sol_to_disk()
-    optimal_best_paths = optimal_sol.read_best_paths()
-    plotter_optimal.update(None, optimal_best_paths)  # None because
-    # no pheromone information here
-    optimal_fuel_placeholder.text(optimal_sol.get_fuel_spent())
-    optimal_path_placeholder.text(optimal_best_paths)
+    optimal_best_paths, optimal_best_paths_before_tsp_correction = \
+        optimal_sol.read_best_paths()
+
+    plotter_optimal.update(None, optimal_best_paths_before_tsp_correction)
+    # None because no pheromone information here
+    #plotter_optimal2.update(None, optimal_best_paths)
+
+    fuel_spent, fuel_spent_before_tsp_correction = optimal_sol.get_fuel_spent()
+    optimal_fuel_placeholder.text(fuel_spent_before_tsp_correction)
+    #optimal_fuel_placeholder2.text(fuel_spent)
+
+    optimal_path_placeholder.text(optimal_best_paths_before_tsp_correction)
+    #optimal_path_placeholder2.text(optimal_best_paths)
 
 
 
@@ -93,4 +108,4 @@ def main(streamlit_viz=0):
 
 
 if __name__ == '__main__':
-    main(streamlit_viz=1)
+    main(streamlit_viz=0)
