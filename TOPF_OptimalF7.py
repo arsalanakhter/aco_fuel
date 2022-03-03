@@ -22,7 +22,7 @@ class TOPF_OptimalF7:
         self.vel = 1
         self.thisSeed = seed
         self.K = [f'R{i}' for i in range(n_ants)]
-        self.T = [f'T{i}' for i in range(g.depots, g.depots + g.tasks)]
+        self.T = [f'T{i}' for i in range(g.tasks)]
         self.D = [f'D{i}' for i in range(g.depots)]
         self.S = ['S0']
         self.E = ['E0']
@@ -241,22 +241,16 @@ class TOPF_OptimalF7:
             if nodes == ['S0', 'D0', 'E0'] or len(nodes) < 3:
                 print ("No Nodes exist for Concorde to solve!")
                 break
-            t_solver_map = {i: node for i, node in zip(range(len(nodes)),
-                                                       self.nodesInOrder[k])}
-            # Remove E0, we'll later add it. This is possibly due to an
-            # implementation quirk in the MILP formulation, where E0 also
-            # acts as a depot.
-            nodes.remove('E0')
             X = [self.N_loc[node][0] for node in self.nodesInOrder[k]]
             Y = [self.N_loc[node][1] for node in self.nodesInOrder[k]]
+            t_solver_map = {i: node for i, node in zip(range(len(nodes)),
+                                                       self.nodesInOrder[k])}
             solver_t = TSPSolver.from_data(X, Y, norm="EUC_2D")
             tour_data = solver_t.solve()
             mapped_tour = [t_solver_map[i] for i in tour_data.tour]
             self.tsp_corrected_tour_nodes[k] = mapped_tour
-            self.tsp_corrected_tour_nodes[k].append('E0')
             # Compute the new fuel spent
             for arc_0, arc_1 in zip(mapped_tour[:-1], mapped_tour[1:]):
-                if arc_0 != arc_1:
-                    self.fuel_spent[k] += self.c[(arc_0, arc_1)]
+                self.fuel_spent[k] += self.c[(arc_0, arc_1)]
         self.tspCorrectedNodesInOrderList = [list(i)
                                              for i in self.tsp_corrected_tour_nodes.values()]
