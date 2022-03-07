@@ -12,6 +12,7 @@ class TOPF_ACO_AntPool:
 
     def __init__(self, id, robots, graph, start_node, fuelf, timef,
                  max_fuel, max_time, heuristicf, pheromonef):
+        self.gamma = 1e-4
         self.id = id
         self.n = robots
         self.g = graph
@@ -26,7 +27,7 @@ class TOPF_ACO_AntPool:
         self.visited_g = {idx: 0 for idx in range(self.g.depots,
                                                   self.g.num_nodes())}
         self.best_set_of_paths = []
-        self.total_distance_of_best_set_of_paths = sys.maxsize
+        self.best_objective_val = 0
         self.best_pool_fuel_spent = {}
         self.no_of_ants_done = 0
 
@@ -138,7 +139,6 @@ class TOPF_ACO_AntPool:
                             ant.fuel = ant.max_fuel
                             # Check if we are at the start node, and  there is
                             # no other node within feasible fuel range
-                            feasible = 0
                             if pick == 0:
                                 # First check if enough mission time is still
                                 # available for a visit to any location
@@ -187,21 +187,21 @@ class TOPF_ACO_AntPool:
         # Collect all the paths
         for ant in self.ants:
             paths.append(ant.get_path())
-        # Check if the global set of paths found is better than the
-        # current set for this pool
-        total_dist_this_run = 0
+        # Check if the objective value found is the best objective
+        # value. Assume reward for each task to be 1 for now
+        objective_val_this_run = len(set([i for path in paths
+                                          for i in path
+                                          if i >= self.g.depots]))
         pool_fuel_spent_this_run = {
             ant.id: ant.distance_travelled for ant in self.ants}
         for ant in self.ants:
-            total_dist_this_run += ant.distance_travelled
-        if total_dist_this_run < \
-                self.total_distance_of_best_set_of_paths:
-            self.total_distance_of_best_set_of_paths = \
-                total_dist_this_run
+            objective_val_this_run -= self.gamma*ant.distance_travelled
+        if objective_val_this_run >= self.best_objective_val:
+            self.best_objective_val = objective_val_this_run
             self.best_set_of_paths = paths[:]
             self.best_pool_fuel_spent = pool_fuel_spent_this_run
         return self.best_set_of_paths, \
-               self.total_distance_of_best_set_of_paths, \
+               self.best_objective_val, \
                self.best_pool_fuel_spent
 
     def can_reach_final_node(self, ant):

@@ -25,7 +25,7 @@ class TOPF_ACO:
                                           robots))
         self.pheromone_growth_constant = 100
         self.best_paths_global = []
-        self.best_paths_total_length_global = sys.maxsize
+        self.best_objective_val_global = 0
         self.pool_fuel_best_global = {}
 
     def decay_pheromone(self):
@@ -53,16 +53,14 @@ class TOPF_ACO:
 
     def run(self, max_iterations, plot_update_func, graph):
         """Performs a full run"""
-        best_paths = []
-        pool_fuel = {}
         for t in range(0, max_iterations):
             for pool in self.pools:
                 pool.reset()
-                best_paths, best_paths_total_length, pool_fuel = \
+                best_paths, best_objective_val, pool_fuel = \
                     pool.compute_paths(self.rng, self.pheromone_matrix)
-                if best_paths_total_length < self.best_paths_total_length_global:
+                if best_objective_val >= self.best_objective_val_global:
                     self.best_paths_global = best_paths
-                    self.best_paths_total_length_global = best_paths_total_length
+                    self.best_objective_val_global = best_objective_val
                     self.pool_fuel_best_global = pool_fuel
             self.decay_pheromone()
             for pool in self.pools:
@@ -70,10 +68,12 @@ class TOPF_ACO:
             print(f'Iter:{t}', self)
             print(f'Best Path(s): {self.best_paths_global}')
             print(f'Best Path(s) Lengths: '
-                  f'{self.best_paths_total_length_global:0.2f}\n\n')
+                  f'{self.best_objective_val_global:0.5f}\n\n')
             plot_update_func(self.pheromone_matrix, self.best_paths_global)
 
-        return self.pool_fuel_best_global, self.best_paths_global
+        return self.pool_fuel_best_global, \
+               self.best_paths_global, \
+               self.best_objective_val_global
 
     def __str__(self):
         s = "TOPF_ACO\n"

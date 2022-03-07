@@ -36,11 +36,11 @@ def main(streamlit_viz=0):
     else:
         n_depots = 3
         n_tasks = 7
-        n_pools = 18
+        n_pools = 12
         n_ants = 2
-        max_ant_fuel = 1.89
-        max_mission_time = 2.90
-        n_iterations = 29
+        max_ant_fuel = 102
+        max_mission_time = 290
+        n_iterations = 26
 
     g = Graph(rng,  # random number generator
               n_depots,  # No. of depots
@@ -90,10 +90,11 @@ def main(streamlit_viz=0):
     )
     # st.header("Console Output:")
     # with st_stdout("code"):
-    pool_fuel, best_paths = aco.run(n_iterations,  # number of iterations
+    pool_fuel, best_paths, best_obj_val = aco.run(n_iterations,  # number of iterations
                                     plotter_aco.update, g)
     aco_fuel_placeholder.text(pool_fuel)
     aco_path_placeholder.text(best_paths)
+    aco_objective_value_placeholder.text(best_obj_val)
 
 
 if __name__ == '__main__':
