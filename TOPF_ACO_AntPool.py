@@ -75,7 +75,8 @@ class TOPF_ACO_AntPool:
         # Feasible if:
         # 1) We can go from this depot to the start node
         # 2) There is enough mission time left
-        feasible_depots = [i for i in range(self.g.depots)]
+        # Do not pick the current depot we are at.
+        feasible_depots = [i for i in range(self.g.depots) if i != ant.current_node]
         # Based on this ant's fuel, remove those depots from feasible
         # depots which this ant cannot reach
         to_be_removed = []
@@ -108,9 +109,9 @@ class TOPF_ACO_AntPool:
         return feasible_depots
 
     def compute_paths(self, rng, pheromone_matrix):
-        # for each ant that is not done calculate the feasible tasks
+        # for each ant that is not done calculate feasible tasks
         # if there are feasible tasks, move the ant, and mark that
-        # tasks as visited.
+        # task as visited.
         # if there are no feasible tasks, see if all tasks have been
         # visited.
         #       If all tasks have been visited, move the ant
@@ -131,8 +132,9 @@ class TOPF_ACO_AntPool:
                         # Check if there is still a task that has not been
                         # visited
                         if not all(task for task in self.visited_g.values()):
-                            # Move to a feasible depot
+                            # Randomly Move to a feasible depot
                             f_d = self.depots_feasible_for(ant)
+                            f_d = [rng.choice(f_d)]
                             pick = ant.move(self.g, f_d, pheromone_matrix, rng)
                             # Since the ant has reached a feasible depot, set
                             # the fuel to be max fuel
