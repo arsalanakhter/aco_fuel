@@ -3,7 +3,8 @@ from TOPF_ACO_Shared import TOPF_ACO_Shared
 from plotter import MapPlotter
 from streamlit_print import st_stdout
 
-from utils import fuelf_linear, timef_linear, pheromonef_lay, topf_aco_individual
+from utils import fuelf_linear, timef_linear, pheromonef_lay, \
+    topf_aco_individual_min_worst, topf_aco_individual_min_all
 
 from numpy.random import default_rng
 import streamlit as st
@@ -53,12 +54,20 @@ def main(streamlit_viz=0):
     #     dist_debug_placeholder.text(
     #         f'Distance b/w nodes {n1} and {n2} : {g.dist(n1, n2):0.2f}')
 
-    st.header("ACO")
+    st.header("TOPF-ACO-Min-Worst")
     aco_fuel_placeholder = st.empty()
     aco_path_placeholder = st.empty()
     aco_objective_value_placeholder = st.empty()
     plotter_aco = MapPlotter(g, n_ants)
     plotter_aco.init_plot()
+
+
+    st.header("TOPF-ACO-Min-All")
+    aco2_fuel_placeholder = st.empty()
+    aco2_path_placeholder = st.empty()
+    aco2_objective_value_placeholder = st.empty()
+    plotter_aco2 = MapPlotter(g, n_ants)
+    plotter_aco2.init_plot()
 
     st.header("MILP")
     optimal_fuel_placeholder = st.empty()
@@ -86,7 +95,7 @@ def main(streamlit_viz=0):
         f'Obj Val: {optimal_sol.get_objective_value()}')
 
 
-
+    # Aco-Min-Worst
     aco = TOPF_ACO_Shared(
         rng,  # random number generator
         n_pools,  # pools
@@ -99,7 +108,7 @@ def main(streamlit_viz=0):
         max_mission_time,  # max_time
         None,  # heuristic function
         pheromonef_lay,  # pheromone function
-        topf_aco_individual  # Objective function
+        topf_aco_individual_min_worst  # Objective function
     )
     # st.header("Console Output:")
     # with st_stdout("code"):
@@ -109,6 +118,30 @@ def main(streamlit_viz=0):
     aco_path_placeholder.text(best_paths)
     aco_objective_value_placeholder.text(best_obj_val)
 
+    # Aco-Min-All
+    aco = TOPF_ACO_Shared(
+        rng,  # random number generator
+        n_pools,  # pools
+        n_ants,  # ants per pool
+        g,  # graph
+        0,  # start_node
+        fuelf_linear,  # fuel function
+        timef_linear,  # time function
+        max_ant_fuel,  # maximum fuel for each ant
+        max_mission_time,  # max_time
+        None,  # heuristic function
+        pheromonef_lay,  # pheromone function
+        topf_aco_individual_min_all  # Objective function
+    )
+    # st.header("Console Output:")
+    # with st_stdout("code"):
+    pool_fuel, best_paths, best_obj_val = aco.run(n_iterations,  # number of iterations
+                                    plotter_aco2.update, g)
+    aco2_fuel_placeholder.text(pool_fuel)
+    aco2_path_placeholder.text(best_paths)
+    aco2_objective_value_placeholder.text(best_obj_val)
+
+
 
 if __name__ == '__main__':
-    main(streamlit_viz=0)
+    main(streamlit_viz=1)
