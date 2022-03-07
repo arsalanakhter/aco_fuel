@@ -35,7 +35,8 @@ class MapPlotter:
             mode='markers',
             marker=dict(color='blue', size=9),
             name='Tasks',
-            text=self.graph.depots + np.array(range(len(self.graph.nodes[self.graph.depots:, 0])))
+            text=self.graph.depots + np.array(
+                range(len(self.graph.nodes[self.graph.depots:, 0])))
         ))
 
         # Add Best Paths (to be updated later)
@@ -46,7 +47,7 @@ class MapPlotter:
                 line=dict(color=self._pick_random_color()),
                 hoverinfo='none',
                 showlegend=True,
-                name='Best Path Ant '+str(n),
+                name='Best Path Ant ' + str(n),
                 mode='lines'))
 
         self.st_plotly_chart = st.plotly_chart(self.fig)
@@ -57,7 +58,7 @@ class MapPlotter:
         # self.text = st.empty()
 
     def update(self, pheromone_matrix, best_paths):
-        #self._update_pheromone_lines(pheromone_matrix)
+        # self._update_pheromone_lines(pheromone_matrix)
         self._update_best_paths(best_paths)
         self.st_plotly_chart.plotly_chart(self.fig)
         time.sleep(1)
@@ -84,7 +85,8 @@ class MapPlotter:
     #     lng = [line["start"][0] for line in lines]
     #     center_lat = (max(lat) - min(lat)) / 2 + min(lat)
     #     center_lng = (max(lng) - min(lng)) / 2 + min(lng)
-    #     return pydeck.ViewState(latitude=center_lat, longitude=center_lng, zoom=self.zoom, max_zoom=10, pitch=0, bearing=0)
+    #     return pydeck.ViewState(latitude=center_lat, longitude=center_lng,
+    #     zoom=self.zoom, max_zoom=10, pitch=0, bearing=0)
     #
 
     def _update_pheromone_lines(self, p_matrix):
@@ -105,22 +107,23 @@ class MapPlotter:
         '''
         for n in range(self.n_ants):
             path_coords = self.graph.nodes[best_paths[n], :]
-            self.fig.update_traces(selector=dict(name='Best Path Ant '+str(n)),
-                                   x=path_coords[:, 0],
-                                   y=path_coords[:, 1])
+            self.fig.update_traces(
+                selector=dict(name='Best Path Ant ' + str(n)),
+                x=path_coords[:, 0],
+                y=path_coords[:, 1])
 
     def _pick_random_color(self):
-        colors = [  'black',
-                    'maroon', 	#800000
-                    'red', 	    #ff0000
-                    'purple', 	#800080
-                    'fuchsia', 	#ff00ff
-                    'green', 	#008000
-                    'olive', 	#808000
-                    # 'yellow', #ffff00
-                    'navy', 	#000080
-                    'blue', 	#0000ff
-                    'teal', 	#008080
-                    'aqua']
+        colors = ['black',
+                  'maroon',  # 800000
+                  'red',  # ff0000
+                  'purple',  # 800080
+                  'fuchsia',  # ff00ff
+                  'green',  # 008000
+                  'olive',  # 808000
+                  # 'yellow', #ffff00
+                  'navy',  # 000080
+                  'blue',  # 0000ff
+                  'teal',  # 008080
+                  'aqua']
         # getting random color from list of hex colors
         return random.choice(colors)

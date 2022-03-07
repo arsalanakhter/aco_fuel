@@ -21,7 +21,7 @@ def main(streamlit_viz=0):
 
     if streamlit_viz:
         form = st.sidebar.form(key='sidebar_form')
-        submit_button = form.form_submit_button(label='Submit')
+        form.form_submit_button(label='Submit')
         n_depots = form.slider("Number of depots", 1, 10, 1)
         n_tasks = form.slider("Number of tasks", 1, 10, 1)
         n_pools = form.slider("Number of ant pools", 1, 50, 1)
@@ -46,6 +46,14 @@ def main(streamlit_viz=0):
               n_depots,  # No. of depots
               n_tasks  # No. of Tasks
               )
+
+    # Add a form to compute weight between any two nodes
+    weight_form = st.sidebar.form(key='weight_form')
+    n1 = weight_form.text_input(label='Node 1')
+    n2 = weight_form.text_input(label='Node 2')
+    calculate_weight_button = weight_form.form_submit_button(label='Calculate')
+    st.sidebar.text(f'{g.adj_dist[int(n1), int(n2)]:0.2f}')
+
 
     st.header("ACO")
     aco_fuel_placeholder = st.empty()
