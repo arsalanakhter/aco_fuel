@@ -50,12 +50,14 @@ def main(streamlit_viz=0):
     st.header("ACO")
     aco_fuel_placeholder = st.empty()
     aco_path_placeholder = st.empty()
+    aco_objective_value_placeholder = st.empty()
     plotter_aco = MapPlotter(g, n_ants)
     plotter_aco.init_plot()
 
     st.header("MILP")
     optimal_fuel_placeholder = st.empty()
     optimal_path_placeholder = st.empty()
+    optimal_objective_value_placeholder = st.empty()
     plotter_optimal = MapPlotter(g, n_ants)
     plotter_optimal.init_plot()
 
@@ -68,6 +70,8 @@ def main(streamlit_viz=0):
     # no pheromone information here
     optimal_fuel_placeholder.text(optimal_sol.get_fuel_spent())
     optimal_path_placeholder.text(optimal_best_paths)
+    optimal_objective_value_placeholder.text(
+        f'Obj Val: {optimal_sol.get_objective_value()}')
 
 
 

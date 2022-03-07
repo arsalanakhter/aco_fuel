@@ -19,7 +19,7 @@ class TOPF_OptimalF7:
         self.vel = 1
         self.thisSeed = seed
         self.K = [f'R{i}' for i in range(n_ants)]
-        self.T = [f'T{i}' for i in range(g.tasks)]
+        self.T = [f'T{i}' for i in range(g.depots, g.depots + g.tasks)]
         self.D = [f'D{i}' for i in range(g.depots)]
         self.S = ['S0']
         self.E = ['E0']
@@ -141,7 +141,7 @@ class TOPF_OptimalF7:
         # self.model.params.TimeLimit = 30
         self.model.Params.MIPGap = 1e-4
         self.model.optimize()
-
+        self.model.printAttr('x')
         return self.model
 
     def write_lp_and_sol_to_disk(self):
@@ -229,3 +229,6 @@ class TOPF_OptimalF7:
 
     def get_fuel_spent(self):
         return self.fuel_spent
+
+    def get_objective_value(self):
+        return self.objective_val
