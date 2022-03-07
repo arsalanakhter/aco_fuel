@@ -16,6 +16,7 @@ def main(streamlit_viz=0):
     st.title("Ant Colony Optimization with Fuel")
     st.write("Create a graph with task an depot nodes. Display the "
              "pheromones and best path.")
+    dist_debug_placeholder = st.empty()
     seed = 12345
     rng = default_rng(seed)
 
@@ -46,14 +47,11 @@ def main(streamlit_viz=0):
               n_depots,  # No. of depots
               n_tasks  # No. of Tasks
               )
-    #
-    # # Add a form to compute weight between any two nodes
-    # weight_form = st.sidebar.form(key='weight_form')
-    # n1 = weight_form.text_input(label='Node 1')
-    # n2 = weight_form.text_input(label='Node 2')
-    # calculate_weight_button = weight_form.form_submit_button(label='Calculate')
-    # st.sidebar.text(f'{g.adj_dist[int(n1), int(n2)]:0.2f}')
 
+    n1 = 1
+    n2 = 4
+    dist_debug_placeholder.text(
+        f'Distance b/w nodes {n1} and {n2} : {g.dist(n1, n2):0.2f}')
 
     st.header("ACO")
     aco_fuel_placeholder = st.empty()
