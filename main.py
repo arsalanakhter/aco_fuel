@@ -46,13 +46,13 @@ def main(streamlit_viz=0):
               n_depots,  # No. of depots
               n_tasks  # No. of Tasks
               )
-
-    # Add a form to compute weight between any two nodes
-    weight_form = st.sidebar.form(key='weight_form')
-    n1 = weight_form.text_input(label='Node 1')
-    n2 = weight_form.text_input(label='Node 2')
-    calculate_weight_button = weight_form.form_submit_button(label='Calculate')
-    st.sidebar.text(f'{g.adj_dist[int(n1), int(n2)]:0.2f}')
+    #
+    # # Add a form to compute weight between any two nodes
+    # weight_form = st.sidebar.form(key='weight_form')
+    # n1 = weight_form.text_input(label='Node 1')
+    # n2 = weight_form.text_input(label='Node 2')
+    # calculate_weight_button = weight_form.form_submit_button(label='Calculate')
+    # st.sidebar.text(f'{g.adj_dist[int(n1), int(n2)]:0.2f}')
 
 
     st.header("ACO")
@@ -81,8 +81,6 @@ def main(streamlit_viz=0):
     optimal_objective_value_placeholder.text(
         f'Obj Val: {optimal_sol.get_objective_value()}')
 
-
-
     aco = TOPF_ACO_Shared(
         rng,  # random number generator
         n_pools,  # pools
@@ -106,4 +104,4 @@ def main(streamlit_viz=0):
 
 
 if __name__ == '__main__':
-    main(streamlit_viz=1)
+    main(streamlit_viz=0)

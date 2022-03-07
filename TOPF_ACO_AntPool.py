@@ -77,6 +77,8 @@ class TOPF_ACO_AntPool:
         # 2) There is enough mission time left
         # Do not pick the current depot we are at.
         feasible_depots = [i for i in range(self.g.depots) if i != ant.current_node]
+        if not feasible_depots and ant.current_node == ant.start_node:
+            feasible_depots = [ant.start_node]
         # Based on this ant's fuel, remove those depots from feasible
         # depots which this ant cannot reach
         to_be_removed = []
