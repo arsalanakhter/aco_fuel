@@ -11,8 +11,8 @@ class TOPF_ACO_AntPool:
     """
 
     def __init__(self, id, robots, graph, start_node, fuelf, timef,
-                 max_fuel, max_time, heuristicf, pheromonef):
-        self.gamma = 1e-4
+                 max_fuel, max_time, heuristicf, pheromonef, obj_fn):
+        self.obj_fn = obj_fn
         self.id = id
         self.n = robots
         self.g = graph
@@ -26,7 +26,7 @@ class TOPF_ACO_AntPool:
         self.pheromonef = pheromonef
         self.visited_g = {idx: 0 for idx in range(self.g.depots,
                                                   self.g.num_nodes())}
-        self.best_set_of_paths = []
+        self.best_set_of_paths = [[ant.start_node] for ant in self.ants]
         self.best_objective_val = 0
         self.best_pool_fuel_spent = {}
         self.no_of_ants_done = 0
@@ -77,8 +77,6 @@ class TOPF_ACO_AntPool:
         # 2) There is enough mission time left
         # Do not pick the current depot we are at.
         feasible_depots = [i for i in range(self.g.depots) if i != ant.current_node]
-        if not feasible_depots and ant.current_node == ant.start_node:
-            feasible_depots = [ant.start_node]
         # Based on this ant's fuel, remove those depots from feasible
         # depots which this ant cannot reach
         to_be_removed = []
@@ -107,6 +105,8 @@ class TOPF_ACO_AntPool:
                 to_be_removed.append(n)
 
         feasible_depots = [n for n in feasible_depots if n not in to_be_removed]
+        if not feasible_depots and ant.current_node == ant.start_node:
+            feasible_depots = [ant.start_node]
 
         return feasible_depots
 
@@ -192,18 +192,25 @@ class TOPF_ACO_AntPool:
         for ant in self.ants:
             paths.append(ant.get_path())
         # Check if the objective value found is the best objective
-        # value. Assume reward for each task to be 1 for now
-        objective_val_this_run = len(set([i for path in paths
-                                          for i in path
-                                          if i >= self.g.depots]))
-        pool_fuel_spent_this_run = {
-            ant.id: ant.distance_travelled for ant in self.ants}
-        for ant in self.ants:
-            objective_val_this_run -= self.gamma*ant.distance_travelled
-        if objective_val_this_run >= self.best_objective_val:
-            self.best_objective_val = objective_val_this_run
-            self.best_set_of_paths = paths[:]
-            self.best_pool_fuel_spent = pool_fuel_spent_this_run
+        # value.
+        best_paths, obj_val, fuel_spent = self.obj_fn(self.g, self.ants, paths,
+                                                      self.best_objective_val)
+        if best_paths:
+            self.best_set_of_paths = best_paths
+            self.best_objective_val = obj_val
+            self.best_pool_fuel_spent = fuel_spent
+
+        # objective_val_this_run = len(set([i for path in paths
+        #                                   for i in path
+        #                                   if i >= self.g.depots]))
+        # pool_fuel_spent_this_run = {
+        #     ant.id: ant.distance_travelled for ant in self.ants}
+        # for ant in self.ants:
+        #     objective_val_this_run -= self.gamma*ant.distance_travelled
+        # if objective_val_this_run >= self.best_objective_val:
+        #     self.best_objective_val = objective_val_this_run
+        #     self.best_set_of_paths = paths[:]
+        #     self.best_pool_fuel_spent = pool_fuel_spent_this_run
         return self.best_set_of_paths, \
                self.best_objective_val, \
                self.best_pool_fuel_spent

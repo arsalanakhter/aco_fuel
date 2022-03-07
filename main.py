@@ -3,7 +3,7 @@ from TOPF_ACO_Shared import TOPF_ACO_Shared
 from plotter import MapPlotter
 from streamlit_print import st_stdout
 
-from utils import fuelf_linear, timef_linear, pheromonef_lay
+from utils import fuelf_linear, timef_linear, pheromonef_lay, topf_aco_individual
 
 from numpy.random import default_rng
 import streamlit as st
@@ -16,7 +16,6 @@ def main(streamlit_viz=0):
     st.title("Ant Colony Optimization with Fuel")
     st.write("Create a graph with task an depot nodes. Display the "
              "pheromones and best path.")
-    dist_debug_placeholder = st.empty()
     seed = 12345
     rng = default_rng(seed)
 
@@ -32,15 +31,15 @@ def main(streamlit_viz=0):
         max_mission_time = form.slider("Maximum mission time", 1,
                                        500, 1)
         n_iterations = form.slider("Number Of ACO Iterations", 1,
-                                   50, 1)
+                                   500, 1)
 
     else:
         n_depots = 3
         n_tasks = 7
         n_pools = 12
-        n_ants = 2
-        max_ant_fuel = 102
-        max_mission_time = 290
+        n_ants = 3
+        max_ant_fuel = 92
+        max_mission_time = 92
         n_iterations = 26
 
     g = Graph(rng,  # random number generator
@@ -48,10 +47,11 @@ def main(streamlit_viz=0):
               n_tasks  # No. of Tasks
               )
 
-    n1 = 1
-    n2 = 4
-    dist_debug_placeholder.text(
-        f'Distance b/w nodes {n1} and {n2} : {g.dist(n1, n2):0.2f}')
+    # if DIST_DEBUG:
+    #     n1 = 0
+    #     n2 = 0
+    #     dist_debug_placeholder.text(
+    #         f'Distance b/w nodes {n1} and {n2} : {g.dist(n1, n2):0.2f}')
 
     st.header("ACO")
     aco_fuel_placeholder = st.empty()
@@ -67,6 +67,12 @@ def main(streamlit_viz=0):
     plotter_optimal = MapPlotter(g, n_ants)
     plotter_optimal.init_plot()
 
+    DIST_DEBUG = 1
+    dist_matrix_placeholder = st.empty()
+    if DIST_DEBUG:
+        dist_matrix_placeholder.code(g.adj_dist)
+
+
     optimal_sol = TOPF_OptimalF7(g, n_ants, max_ant_fuel,
                                  max_mission_time, seed)
     optimal_sol.solve()
@@ -79,6 +85,8 @@ def main(streamlit_viz=0):
     optimal_objective_value_placeholder.text(
         f'Obj Val: {optimal_sol.get_objective_value()}')
 
+
+
     aco = TOPF_ACO_Shared(
         rng,  # random number generator
         n_pools,  # pools
@@ -90,7 +98,8 @@ def main(streamlit_viz=0):
         max_ant_fuel,  # maximum fuel for each ant
         max_mission_time,  # max_time
         None,  # heuristic function
-        pheromonef_lay  # pheromone function
+        pheromonef_lay,  # pheromone function
+        topf_aco_individual  # Objective function
     )
     # st.header("Console Output:")
     # with st_stdout("code"):

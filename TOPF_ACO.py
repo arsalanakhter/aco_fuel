@@ -15,11 +15,11 @@ from TOPF_ACO_AntPool import TOPF_ACO_AntPool
 class TOPF_ACO:
 
     def __init__(self, rng, pools, robots, graph, start_node, fuelf, timef,
-                 max_fuel, max_time, heuristicf, pheromonef):
+                 max_fuel, max_time, heuristicf, pheromonef, obj_fn):
         self.rng = rng
         self.pools = [TOPF_ACO_AntPool(i, robots, graph, start_node, fuelf,
                                        timef, max_fuel, max_time, heuristicf,
-                                       pheromonef)
+                                       pheromonef, obj_fn)
                       for i in range(0, pools)]
         self.pheromone_matrix = np.zeros((graph.num_nodes(), graph.num_nodes(),
                                           robots))
