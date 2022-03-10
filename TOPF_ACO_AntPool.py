@@ -18,7 +18,7 @@ class TOPF_ACO_AntPool:
         self.g = graph
         self.ants = [TOPF_ACO_Ant(
             i, start_node, fuelf, timef, max_fuel,
-            max_time) for i in range(0, self.n)]
+            max_time, heuristicf) for i in range(0, self.n)]
         self.fuelf = fuelf
         self.timef = timef
         self.max_time = max_time

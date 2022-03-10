@@ -1,13 +1,14 @@
 class TOPF_ACO_Ant:
 
     def __init__(self, id, start_node, fuelf, timef, max_fuel,
-                 max_time):
+                 max_time, heuristicf):
         self.id = id
         self.start_node = start_node
         self.fuelf = fuelf
         self.timef = timef
         self.max_time = max_time
         self.max_fuel = max_fuel
+        self.heuristicf = heuristicf
         self.alpha = 0.05  # Parameter to weigh the effect of
         # pheromone on choosing next node
         self.beta = 0.2  # Parameter to weigh the effect of distance
@@ -31,7 +32,7 @@ class TOPF_ACO_Ant:
         :param rng: The random number generator
         """
         # TODO: Check ant move function for its accuracy
-        attractiveness = dict()
+        attractiveness_probability = dict()
         sum_total = 0.0
 
         for possible_next_node in feasible:
@@ -52,23 +53,24 @@ class TOPF_ACO_Ant:
             distance = float(
                 graph.dist(self.current_node, possible_next_node))
             # Handle the case if starting depot is picked up
-            attractiveness[possible_next_node] = pow(pheromone,
-                                                     self.alpha) * pow(
-                1 / (distance + 0.000001), self.beta)
-            sum_total += attractiveness[possible_next_node]
+            attractiveness_probability[possible_next_node] = pow(
+                pheromone, self.alpha) * pow(
+                self.heuristicf(distance), self.beta)
+            sum_total += attractiveness_probability[possible_next_node]
 
         if sum_total != 0:
             rnd_num = rng.random()
             cumulative = 0.0
             pick = -1
-            for possible_next_node in attractiveness:
-                weight = attractiveness[possible_next_node] / sum_total
+            for possible_next_node in attractiveness_probability:
+                weight = attractiveness_probability[
+                             possible_next_node] / sum_total
                 if rnd_num <= weight + cumulative:
                     pick = possible_next_node
                     break
                 cumulative += weight
         else:
-            pick = rng.choice(list(attractiveness.keys()))
+            pick = rng.choice(list(attractiveness_probability.keys()))
 
         # Update fuel
         self.fuel = self.fuelf(self.fuel, graph, self.current_node,

@@ -63,9 +63,9 @@ def topf_aco_individual_min_all(g, ants, set_of_paths, best_objective_val_so_far
 
 ########################################
 
-def heuristicf_random():
-    pass
-
+def heuristicf_edge_length_inverse(distance):
+    dist_epsilon = 1e-6  # To handle division by zero
+    return 1 / (distance + dist_epsilon)
 
 ########################################
 

@@ -4,7 +4,8 @@ from plotter import MapPlotter
 from streamlit_print import st_stdout
 
 from utils import fuelf_linear, timef_linear, pheromonef_lay, \
-    topf_aco_individual_min_worst, topf_aco_individual_min_all
+    topf_aco_individual_min_worst, topf_aco_individual_min_all, \
+    heuristicf_edge_length_inverse
 
 from numpy.random import default_rng
 import streamlit as st
@@ -106,7 +107,7 @@ def main(streamlit_viz=0):
         timef_linear,  # time function
         max_ant_fuel,  # maximum fuel for each ant
         max_mission_time,  # max_time
-        None,  # heuristic function
+        heuristicf_edge_length_inverse,  # heuristic function
         pheromonef_lay,  # pheromone function
         topf_aco_individual_min_worst  # Objective function
     )
@@ -129,7 +130,7 @@ def main(streamlit_viz=0):
         timef_linear,  # time function
         max_ant_fuel,  # maximum fuel for each ant
         max_mission_time,  # max_time
-        None,  # heuristic function
+        heuristicf_edge_length_inverse,  # heuristic function
         pheromonef_lay,  # pheromone function
         topf_aco_individual_min_all  # Objective function
     )
