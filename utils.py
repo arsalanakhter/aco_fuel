@@ -1,3 +1,6 @@
+import networkx as nx
+
+
 def fuelf_linear(fuel, graph, cur_node, next_node):
     """Computes the fuel left after visiting next_node from cur_node"""
     return fuel - graph.dist(cur_node, next_node)
@@ -12,7 +15,8 @@ def timef_linear(time, graph, cur_node, next_node):
 
 ########################################
 
-def topf_aco_individual_min_worst(g, ants, set_of_paths, best_objective_val_so_far):
+def topf_aco_individual_min_worst(g, ants, set_of_paths,
+                                  best_objective_val_so_far):
     """Objective function for TOPF ACO Individual, which is modelled
     in a similar way as TOPF-Individual. Only the worst distance is minimized.
     Only returns if it did find a better objective value"""
@@ -38,7 +42,8 @@ def topf_aco_individual_min_worst(g, ants, set_of_paths, best_objective_val_so_f
 
 ########################################
 
-def topf_aco_individual_min_all(g, ants, set_of_paths, best_objective_val_so_far):
+def topf_aco_individual_min_all(g, ants, set_of_paths,
+                                best_objective_val_so_far):
     """Objective function for TOPF ACO Individual minimize all routes.
     Only returns if it did find a better objective value"""
     # Assume reward for each task to be 1 for now
@@ -66,6 +71,14 @@ def topf_aco_individual_min_all(g, ants, set_of_paths, best_objective_val_so_far
 def heuristicf_edge_length_inverse(distance):
     dist_epsilon = 1e-6  # To handle division by zero
     return 1 / (distance + dist_epsilon)
+
+
+########################################
+
+def heuristicf_node_degree_sum(graph, node):
+    G = nx.from_numpy_matrix(graph)
+    return G.degree[node]
+
 
 ########################################
 

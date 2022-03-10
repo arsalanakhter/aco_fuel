@@ -5,7 +5,7 @@ from streamlit_print import st_stdout
 
 from utils import fuelf_linear, timef_linear, pheromonef_lay, \
     topf_aco_individual_min_worst, topf_aco_individual_min_all, \
-    heuristicf_edge_length_inverse
+    heuristicf_edge_length_inverse, heuristicf_node_degree_sum
 
 from numpy.random import default_rng
 import streamlit as st
@@ -25,7 +25,7 @@ def main(streamlit_viz=0):
         form = st.sidebar.form(key='sidebar_form')
         form.form_submit_button(label='Submit')
         n_depots = form.slider("Number of depots", 1, 10, 1)
-        n_tasks = form.slider("Number of tasks", 1, 10, 1)
+        n_tasks = form.slider("Number of tasks", 1, 50, 1)
         n_pools = form.slider("Number of ant pools", 1, 50, 1)
         n_ants = form.slider("Number of ants per pool", 1, 10, 1)
         max_ant_fuel = form.slider("Maximum Ant Fuel", 1, 500,
@@ -40,9 +40,9 @@ def main(streamlit_viz=0):
         n_tasks = 7
         n_pools = 12
         n_ants = 3
-        max_ant_fuel = 92
-        max_mission_time = 92
-        n_iterations = 26
+        max_ant_fuel = 85
+        max_mission_time = 216
+        n_iterations = 14
 
     g = Graph(rng,  # random number generator
               n_depots,  # No. of depots
@@ -85,15 +85,15 @@ def main(streamlit_viz=0):
 
     optimal_sol = TOPF_OptimalF7(g, n_ants, max_ant_fuel,
                                  max_mission_time, seed)
-    optimal_sol.solve()
-    optimal_sol.write_lp_and_sol_to_disk()
-    optimal_best_paths = optimal_sol.read_best_paths()
-    plotter_optimal.update(None, optimal_best_paths)  # None because
-    # no pheromone information here
-    optimal_fuel_placeholder.text(optimal_sol.get_fuel_spent())
-    optimal_path_placeholder.text(optimal_best_paths)
-    optimal_objective_value_placeholder.text(
-        f'Obj Val: {optimal_sol.get_objective_value()}')
+    # optimal_sol.solve()
+    # optimal_sol.write_lp_and_sol_to_disk()
+    # optimal_best_paths = optimal_sol.read_best_paths()
+    # plotter_optimal.update(None, optimal_best_paths)  # None because
+    # # no pheromone information here
+    # optimal_fuel_placeholder.text(optimal_sol.get_fuel_spent())
+    # optimal_path_placeholder.text(optimal_best_paths)
+    # optimal_objective_value_placeholder.text(
+    #     f'Obj Val: {optimal_sol.get_objective_value()}')
 
 
     # Aco-Min-Worst
@@ -107,7 +107,7 @@ def main(streamlit_viz=0):
         timef_linear,  # time function
         max_ant_fuel,  # maximum fuel for each ant
         max_mission_time,  # max_time
-        heuristicf_edge_length_inverse,  # heuristic function
+        heuristicf_node_degree_sum,  # heuristic function
         pheromonef_lay,  # pheromone function
         topf_aco_individual_min_worst  # Objective function
     )
@@ -130,7 +130,7 @@ def main(streamlit_viz=0):
         timef_linear,  # time function
         max_ant_fuel,  # maximum fuel for each ant
         max_mission_time,  # max_time
-        heuristicf_edge_length_inverse,  # heuristic function
+        heuristicf_node_degree_sum,  # heuristic function
         pheromonef_lay,  # pheromone function
         topf_aco_individual_min_all  # Objective function
     )
