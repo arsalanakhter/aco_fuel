@@ -5,7 +5,8 @@ from streamlit_print import st_stdout
 
 from utils import fuelf_linear, timef_linear, pheromonef_lay, \
     topf_aco_individual_min_worst, topf_aco_individual_min_all, \
-    heuristicf_edge_length_inverse, heuristicf_node_degree_sum
+    heuristicf_edge_length_inverse, heuristicf_node_degree_sum, \
+    heuristicf_max_degree_of_node_neighbours
 
 from numpy.random import default_rng
 import streamlit as st
@@ -109,7 +110,7 @@ def main(streamlit_viz=0):
         max_mission_time,  # max_time
         heuristicf_node_degree_sum,  # heuristic function
         pheromonef_lay,  # pheromone function
-        topf_aco_individual_min_worst  # Objective function
+        topf_aco_individual_min_all  # Objective function
     )
     # st.header("Console Output:")
     # with st_stdout("code"):
@@ -130,7 +131,7 @@ def main(streamlit_viz=0):
         timef_linear,  # time function
         max_ant_fuel,  # maximum fuel for each ant
         max_mission_time,  # max_time
-        heuristicf_node_degree_sum,  # heuristic function
+        heuristicf_max_degree_of_node_neighbours,  # heuristic function
         pheromonef_lay,  # pheromone function
         topf_aco_individual_min_all  # Objective function
     )

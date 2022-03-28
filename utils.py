@@ -82,6 +82,20 @@ def heuristicf_node_degree_sum(graph, node):
 
 ########################################
 
+def heuristicf_max_degree_of_node_neighbours(graph, node):
+    G = nx.from_numpy_matrix(graph)
+    neighbours_iter = G.neighbors(node)
+    # Compute maximum degree for any neighbor
+    max_deg = 0
+    for n in neighbours_iter:
+        deg = G.degree[n]
+        if deg > max_deg:
+            max_deg = deg
+    return max_deg
+
+
+########################################
+
 def pheromonef_lay(pheromone_matrix, ant_pools):
     """Update the pheromone.
     The Pheromone will be updated in two ways:
