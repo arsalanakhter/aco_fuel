@@ -11,7 +11,7 @@ class TOPF_ACO_Ant:
         self.heuristicf = heuristicf
         self.alpha = 0.05  # Parameter to weigh the effect of
         # pheromone on choosing next node
-        self.beta = 20  # Parameter to weigh the effect of heuristic
+        self.beta = 0.2  # Parameter to weigh the effect of distance
         # on choosing next node
         self.reset()
 
@@ -55,12 +55,7 @@ class TOPF_ACO_Ant:
             # Handle the case if starting depot is picked up
             attractiveness_probability[possible_next_node] = pow(
                 pheromone, self.alpha) * pow(
-                self.heuristicf(graph.adj_dist, possible_next_node), self.beta)
-            # attractiveness_probability[possible_next_node] = pow(
-            #     pheromone, self.alpha) * pow(
-            #     self.heuristicf(distance), self.beta)
-
-
+                self.heuristicf(distance), self.beta)
             sum_total += attractiveness_probability[possible_next_node]
 
         if sum_total != 0:
